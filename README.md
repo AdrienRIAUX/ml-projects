@@ -9,3 +9,4 @@ Academic project :
 Kaggle project : 
 - Heart disease project
 - Star classification
+- Churn prediction
