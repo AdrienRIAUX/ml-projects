@@ -6,6 +6,7 @@ I mostly use Python to code on notebook. Nevertheless you can find R code too.
 Academic project : 
 - Car performance project
 - Diabetic retinopathy debrecen project
+- Spam email detection project
 
 Kaggle project : 
 - Heart disease project
