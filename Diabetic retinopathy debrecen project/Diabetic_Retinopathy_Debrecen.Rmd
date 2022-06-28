@@ -7,13 +7,13 @@ output: html_notebook
 
 # Motivation et positionnement du projet
 
-Nous avons choisi le sujet concernant la rétinopathie diabétique. Maladie résultant de la complication d'un diabète et de l'atteinte des vaisseaux de la rétine, mettant en jeu un pronostic visuel. C'est une maladie compliquée à traiter et qui a de graves conséquences. C'est pourquoi l'analyse de ce dataset, ainsi que la création d'un modèle prédictif sont très intéressants pour nous. 
+J'ai choisi le sujet concernant la rétinopathie diabétique. Maladie résultant de la complication d'un diabète et de l'atteinte des vaisseaux de la rétine, mettant en jeu un pronostic visuel. C'est une maladie compliquée à traiter et qui a de graves conséquences. C'est pourquoi l'analyse de ce dataset, ainsi que la création d'un modèle prédictif sont très intéressants pour moi. 
 
-De plus le _diabetic retinopathy debrecen dataset_ nous fournit un nombre conséquent d'individus et des varibles pour mener à bien cette analyse (ce qui devrait nous éviter d'être en underfitting ou overfitting). Il semblerait qu'il n'y ait pas de valeurs manquantes dans le dataset (même si nous allons le vérifier par la suite). 
+De plus le _diabetic retinopathy debrecen dataset_ nous fournit un nombre suffisant d'individus et de varible pour mener à bien cette analyse (ce qui devrait nous éviter d'être en underfitting ou overfitting). Il semblerait qu'il n'y ait pas de valeurs manquantes dans le dataset (même si nous allons le vérifier par la suite). 
 
 La tâche à réaliser pour cette analyse est une classification, puisqu'il faut séparer les cas des patients sains de ceux malades. 
 
-L'ensemble des données contient des caractéristiques extraites des images _Messidor_ dans le but de prédire si une personne est atteinte de rétinopathie diabétique. Toutes les caractéristiques représentent soit une lésion détectée, soit une caratéristique descriptive d'une partie anatomique, ou un descripteur au niveau de l'image. 
+L'ensemble des données contient des caractéristiques extraites des images _Messidor_ dans le but de prédire si une personne est atteinte de rétinopathie diabétique. Toutes les caractéristiques représentent soit une lésion détectée, soit une caratéristique descriptive d'une partie anatomique, soit un descripteur au niveau de l'image. 
 
 # Analyse descriptive 
 
@@ -73,7 +73,7 @@ Maintenant que nous avons le bon type pour chacune de nos variables, nous pouvon
 #On vérifie le type de chaque variables et si il y des valeurs nulles
 str(data)
 ```
-Il n'y a pas de valeurs nulle dans notre dataset. De plus chaque variables possède désormais le bon type. Nous allons pouvoir procéder à l'analyse préliminaire de nos données. 
+Il n'y a pas de valeurs nulle dans notre dataset. De plus chaque variable possède désormais le bon type. Nous allons pouvoir procéder à l'analyse préliminaire de nos données. 
 
 ```{r}
 #On applique sur chaque colonne des statistiques de bases (min, max, moyenne, quartile, etc.)
@@ -431,6 +431,7 @@ On peut maintenant s'intéresser à la performance de notre arbre. Pour cela nou
 
 ```{r}
 #Pour calculer la performance de notre arbre nous allons utiliser une matrice de confusion
+library(caret)
 ypred <- predict(fit, testset, type = "class")
 result <- confusionMatrix(ypred, testset$V20)
 result
@@ -462,7 +463,7 @@ On peut donc maintenant regarder les variables les plus importantes lors de l'ap
 ```{r}
 #Affichage de l'importance des variables
 library(DiagrammeR)
-xgb.plot.importance(xgb.importance(boostedtree, feature_names = colnames(X_train)))
+xgb.plot.importance(xgb.importance(boostedtree, feature_names = colnames(X_data)))
 ```
 On voit que la variable 3 est la plus importante. La variable 15 et 9 le sont aussi. 
 
@@ -470,7 +471,7 @@ Lors de notre apprentissage supervisé, nous avons dû utiliser une méthode par
 
 # Conclusion 
 
-Pour conclure, nous avons dans ce projet une approche complète pour traiter un jeu de données. En procédent dans un premier temps par une analyse statistique des données, afin de mieux les comprendre, et de mieux aborder les étapes précédentes du projet. Nous n'avons pratiquement pas eu de pré-traitement des données à faire, ce qui nous a permis de nous concentrer sur les aspects vus en cours. 
-Dans un deuxième temps nous aborder le sujet du clustering, en supprimant notre variable target, et en utilisant des algortihmes d'apprentissages non supervisés comme KMeans, PAM et CAH. Malheureusement les résultats n'ont pas été très bons. Le KMeans nous a apporté le meilleur résultat, même si celui-ci n'est pas tout à fait convaincant, sachant que le KMeans est sensible aux outliers, tester PAM pouvait être une solution. Cependant les résultats sont moindres avec cet algorithme. Nous en avons conclue que les classes sont non linéairement séparables. Ce qui rend la tâche d'apprentissage non supervisé très compliqué. Une ouverture sur ce problème, est le deep learning où des méthodes commencent à émerger. 
+Pour conclure, nous avons dans ce projet une approche complète pour traiter un jeu de données. En procédent dans un premier temps par une analyse statistique des données, afin de mieux les comprendre, et de mieux aborder les étapes suivantes du projet. Nous n'avons pratiquement pas eu de pré-traitement des données à faire, ce qui m'a permis de me concentrer sur les aspects vus en cours. 
+Dans un deuxième temps nous avons abordé le sujet du clustering, en supprimant notre variable target, et en utilisant des algorithmes d'apprentissages non supervisés comme KMeans, PAM et CAH. Malheureusement les résultats n'ont pas été très bons. Le KMeans nous a apporté le meilleur résultat, même si celui-ci n'est pas tout à fait convaincant, sachant que le KMeans est sensible aux outliers, tester PAM pouvait être une solution. Cependant les résultats sont moindres avec cet algorithme. Nous en avons conclu que les classes sont non linéairement séparables. Ce qui rend la tâche d'apprentissage non supervisé très compliqué. Une ouverture sur ce problème, est le deep learning où des méthodes commencent à émerger. 
 Enfin dans un troisième temps, nous avons réalisé une classification supervisée. Avec tout d'abord un arbre de décision, afin de voir les règles obtenus par notre arbre, ainsi que la répartition de chaque classes dans les feuilles obtenues. Les résultats n'étant pas suffisamment efficaces, nous avons procédé à une méthode par boostrap. Sur laquelle nous avons obtenu de meilleur résultats (89% de précision avec 20 itérations). 
-Ce projet nous a permis de mettre en application les concepts vus en cours et de plus nous familiariser avec le langage R, un langage nouveau pour nous.
+Ce projet m'a permis de mettre en application les concepts vus en cours et de me familiariser avec le langage R, un langage nouveau pour moi.
