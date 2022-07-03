@@ -441,8 +441,10 @@ On observe que nous avons une précision de 65%, ce qui n'est pas très élevé.
 ```{r}
 #On définie nos vecteurs de variables train et test et nos vecteurs de variable target train et test
 #On convertie nos dataframe en matrice car xgboost ne prend en entrée que des matrices
-X_data <- as.matrix(data[-20])
-Y_data <- as.matrix(data[20])
+X_train <- as.matrix(trainset[-20])
+y_train <- as.matrix(trainset[20])
+X_test <- as.matrix(testset[-20])
+y_test <- as.matrix(testset[20])
 ```
 
 Maintenant que nous avons nos matrices, contenant nos variables dans un première matrice et notre variables target dans une seconde. Nous pouvons utiliser l'algorithme xgboost afin de réaliser un arbre de décision par boostrap. 
@@ -454,18 +456,36 @@ En jouant sur ces hyperparamètre, nous pouvons améliorer les performances de n
 ```{r}
 #XGBOOST
 library(xgboost)
-boostedtree <- xgboost(data = X_data, label = Y_data, eta = .3, nrounds = 20, max.depth = 8)
+boostedtree <- xgboost(data = X_train, label = y_train, eta = .3, nrounds = 25, max.depth = 8, objective = 'binary:logistic')
 ```
 
-On utulisant l'algorithme de xgboost, nous arrivons au bout de 20 iterations à grandement améliorer les résulats de notre apprentissage. Nous arrivons à une erreur moyenne de 11% seulement. Ce qui représente de bon résultat. 
+On utilisant l'algorithme de xgboost, nous arrivons au bout de 25 iterations à grandement améliorer les résulats de notre apprentissage. Nous arrivons à une erreur moyenne de 12% seulement. Ce qui représente de bon résultat. 
 
 On peut donc maintenant regarder les variables les plus importantes lors de l'apprentissage de notre arbre. Afin de comprendre quelles variables sont les plus utiles dans l'apprentissage de l'arbre. 
 ```{r}
 #Affichage de l'importance des variables
 library(DiagrammeR)
-xgb.plot.importance(xgb.importance(boostedtree, feature_names = colnames(X_data)))
+xgb.plot.importance(xgb.importance(boostedtree, feature_names = colnames(X_train)))
 ```
 On voit que la variable 3 est la plus importante. La variable 15 et 9 le sont aussi. 
+
+```{r}
+#Prediction du modèle sur le jeu de test
+y_pred <- predict(boostedtree, X_test, type = "class")
+
+#Convertion du vecteur de probabilité en classe 1 ou 0
+y_pred <- as.numeric(y_pred > 0.5)
+
+#Erreur moyenne sur le jeu de test
+err <- mean(y_pred != y_test)
+print(paste("test-error=", err))
+```
+```{r}
+#Matrice de confusion
+result <- confusionMatrix(factor(y_pred), factor(y_test))
+result
+```
+On peut donc voir qu'avec XgBoost, on améliore nos résultats de presque 10%, cependant il faut faire attention à l'overfitting de notre modèle. 
 
 Lors de notre apprentissage supervisé, nous avons dû utiliser une méthode par bosstrap afin d'améliorer nos performances. Celle-ci est très utilisée et permet d'obtenir simplement des très bons résultats (comme nous avons pu le voir). Elle est plus efficace qu'un simple arbre de décision, de plus pour un problème de simple classification comme celui-ci, il n'est pas nécessaire de se lancer dans des algorithmes de deep learning. 
 
