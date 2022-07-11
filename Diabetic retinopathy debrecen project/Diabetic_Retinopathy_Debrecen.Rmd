@@ -276,7 +276,7 @@ set.seed(30)
 km_data <- kmeans(unsu_data, centers = 4)
 km_data
 ```
-Les informations ci-dessus nous donne accès aux barycentres de chaque variables, l'assignation de chaque individus à son cluster et la précision de notre clustering en regardant le ratio inter. Ce ratio inter est de 71,9%, ce qu'on peut considérer comme un résultat correct.
+Les informations ci-dessus nous donne accès aux barycentres de chaque variable, l'assignation de chaque individus à son cluster et la précision de notre clustering en regardant le ratio inter. Ce ratio inter est de 71,9%, ce qu'on peut considérer comme un résultat correct.
 
 Car le KMeans a ses limites et il est possible que dans notre dataset, il n'y est pas de groupes distincts qui se déssinent. Afin de vérifier cela nous pouvons afficher graphiquement les résultats de notre clustering. 
 
