@@ -2,7 +2,7 @@
 title: "Projet d'apprentissage statistique"
 author: "Adrien Riaux"
 date: "18/01/2022"
-output: html_notebook
+output: rmarkdown::github_document
 ---
 
 # Motivation et positionnement du projet
@@ -169,7 +169,7 @@ Cependant on peut remarquer qu'il n'y a pas ou une très faible corrélation ent
 On peut visualiser la matrice de corrélation d'une autre manière, en y ajoutant un dendrogramme. Ce qui peut être intéressant pour voir les couples de variables. 
 
 ```{r}
-#Corrélation des variables avec ajout d'un dendrogramme
+#Corrélation des variables avec ajout d'un dendrogramme sur la heatmap
 heatmap(corr_data, scale = "column", margins = c(2,2))
 ```
 On observe 3 groupes, les deux précédemments observés et un autre qui est formé des variables 17 et 18. Ce dendrogramme nous montre aussi qu'il pourrait être intéressant de regarder le nuage de points entre deux variables qui se suivent (par exemple V13 et V14), car il semblerait que dans notre cas, les premiers duo sont réalisé de cette manière par le dendrogramme. 
