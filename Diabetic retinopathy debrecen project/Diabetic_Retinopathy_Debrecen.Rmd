@@ -150,7 +150,6 @@ library(reshape2)
 library(scales)
 melt_data <- reshape2::melt(corr_data, varnames = c("x","y"), value.name = "Correlation" )
 melt_data <- melt_data[order(melt_data$Correlation),]
-melt_data
 ```
 Ensuite on peut afficher à l'aide d'une heatmap, notre matrice de corrélation. 
 
@@ -162,9 +161,9 @@ ggplot(melt_data, aes(x = x, y = y)) +
   theme_minimal() + 
   labs(x = NULL, y = NULL)
 ```
-On retrouve nos fortes corrélations observées auparavant sur les variables 3 à 8. On peut aussi observer des fortes corrélations entre les variables 9 à 16. Il est donc important de prendre ces variables en compte lors de notre analyse. 
+On retrouve nos fortes corrélations observées auparavant sur les variables 3 à 8. On peut aussi observer des fortes corrélations entre les variables 9 à 16. 
 
-Cependant on peut remarquer qu'il n'y a pas ou une très faible corrélation entre les variables qui constituent les résultats de la détection MA (V3-V8) et ceux des exsudats (V9-V16).
+Cependant on peut remarquer qu'il n'y a pas ou une très faible corrélation entre les variables qui constituent les résultats de la détection MA (V3-V8) et ceux des exsudats (V9-V16). Il est donc important de prendre ces variables en compte lors de notre analyse.
 
 On peut visualiser la matrice de corrélation d'une autre manière, en y ajoutant un dendrogramme. Ce qui peut être intéressant pour voir les couples de variables. 
 
@@ -196,7 +195,6 @@ On peut en conclure que nous ne sommes pas en présence de distribution normale.
 On s'intéresse donc maintenant à une brève analyse des nuages de points entre les variables.
 
 ```{r}
-library(ggplot2)
 #Analyse des nuages de points
 for (i in 3:17){
     g <- ggplot(data, aes(x = data[,i], y = data[,i+1]))
@@ -206,7 +204,7 @@ for (i in 3:17){
 }
 
 ```
-Ces graphiques nous aident à voir que en observant certains nuages de points, il est aisé de différencier les points concernants une personne malade d'une personne saine. On pourrait même placer des valeurs seuils. Ce qui nous conforte dans l'idée d'utiliser un arbre de décision pour effectuer nos prédictions par la suite. 
+Ces graphiques nous aident à voir que en observant certains nuages de points, il est aisé de différencier les points concernants une personne malade d'une personne saine. Ce qui nous conforte dans l'idée qu'une classification supervisée peut mener à de bon résultat. 
 
 Nous allons maintenant passer à l'étape suivante du projet.
 

@@ -364,266 +364,7 @@ library(scales)
 ``` r
 melt_data <- reshape2::melt(corr_data, varnames = c("x","y"), value.name = "Correlation" )
 melt_data <- melt_data[order(melt_data$Correlation),]
-melt_data
 ```
-
-    ##       x   y   Correlation
-    ## 87   V9  V8 -3.755061e-01
-    ## 102  V8  V9 -3.755061e-01
-    ## 71   V9  V7 -3.498107e-01
-    ## 101  V7  V9 -3.498107e-01
-    ## 55   V9  V6 -3.099497e-01
-    ## 100  V6  V9 -3.099497e-01
-    ## 39   V9  V5 -2.831879e-01
-    ## 99   V5  V9 -2.831879e-01
-    ## 23   V9  V4 -2.447041e-01
-    ## 98   V4  V9 -2.447041e-01
-    ## 7    V9  V3 -2.296528e-01
-    ## 97   V3  V9 -2.296528e-01
-    ## 88  V10  V8 -2.236812e-01
-    ## 118  V8 V10 -2.236812e-01
-    ## 72  V10  V7 -1.972788e-01
-    ## 117  V7 V10 -1.972788e-01
-    ## 89  V11  V8 -1.811974e-01
-    ## 134  V8 V11 -1.811974e-01
-    ## 159 V17 V12 -1.679536e-01
-    ## 234 V12 V17 -1.679536e-01
-    ## 56  V10  V6 -1.600115e-01
-    ## 116  V6 V10 -1.600115e-01
-    ## 73  V11  V7 -1.525778e-01
-    ## 133  V7 V11 -1.525778e-01
-    ## 191 V17 V14 -1.509964e-01
-    ## 236 V14 V17 -1.509964e-01
-    ## 175 V17 V13 -1.495531e-01
-    ## 235 V13 V17 -1.495531e-01
-    ## 40  V10  V5 -1.391109e-01
-    ## 115  V5 V10 -1.391109e-01
-    ## 240 V18 V17 -1.314975e-01
-    ## 255 V17 V18 -1.314975e-01
-    ## 127 V17 V10 -1.289904e-01
-    ## 232 V10 V17 -1.289904e-01
-    ## 143 V17 V11 -1.280065e-01
-    ## 233 V11 V17 -1.280065e-01
-    ## 207 V17 V15 -1.226885e-01
-    ## 237 V15 V17 -1.226885e-01
-    ## 24  V10  V4 -1.152530e-01
-    ## 114  V4 V10 -1.152530e-01
-    ## 57  V11  V6 -1.099459e-01
-    ## 132  V6 V11 -1.099459e-01
-    ## 8   V10  V3 -1.030469e-01
-    ## 113  V3 V10 -1.030469e-01
-    ## 144 V18 V11 -9.886573e-02
-    ## 249 V11 V18 -9.886573e-02
-    ## 223 V17 V16 -9.707290e-02
-    ## 238 V16 V17 -9.707290e-02
-    ## 160 V18 V12 -9.073788e-02
-    ## 250 V12 V18 -9.073788e-02
-    ## 128 V18 V10 -9.072122e-02
-    ## 248 V10 V18 -9.072122e-02
-    ## 41  V11  V5 -8.659517e-02
-    ## 131  V5 V11 -8.659517e-02
-    ## 112 V18  V9 -8.647363e-02
-    ## 247  V9 V18 -8.647363e-02
-    ## 111 V17  V9 -8.615495e-02
-    ## 231  V9 V17 -8.615495e-02
-    ## 192 V18 V14 -6.044140e-02
-    ## 252 V14 V18 -6.044140e-02
-    ## 176 V18 V13 -5.864477e-02
-    ## 251 V13 V18 -5.864477e-02
-    ## 25  V11  V4 -5.836370e-02
-    ## 130  V4 V11 -5.836370e-02
-    ## 90  V12  V8 -5.815287e-02
-    ## 150  V8 V12 -5.815287e-02
-    ## 9   V11  V3 -4.464981e-02
-    ## 129  V3 V11 -4.464981e-02
-    ## 208 V18 V15 -3.978329e-02
-    ## 253 V15 V18 -3.978329e-02
-    ## 74  V12  V7 -2.046886e-02
-    ## 149  V7 V12 -2.046886e-02
-    ## 224 V18 V16 -1.909076e-02
-    ## 254 V16 V18 -1.909076e-02
-    ## 91  V13  V8 -1.239987e-02
-    ## 166  V8 V13 -1.239987e-02
-    ## 92  V14  V8 -1.217547e-02
-    ## 182  V8 V14 -1.217547e-02
-    ## 96  V18  V8 -1.160690e-02
-    ## 246  V8 V18 -1.160690e-02
-    ## 95  V17  V8 -2.557217e-03
-    ## 230  V8 V17 -2.557217e-03
-    ## 79  V17  V7 -1.725065e-03
-    ## 229  V7 V17 -1.725065e-03
-    ## 15  V17  V3  1.252511e-06
-    ## 225  V3 V17  1.252511e-06
-    ## 47  V17  V5  3.868124e-04
-    ## 227  V5 V17  3.868124e-04
-    ## 63  V17  V6  1.520284e-03
-    ## 228  V6 V17  1.520284e-03
-    ## 31  V17  V4  1.953079e-03
-    ## 226  V4 V17  1.953079e-03
-    ## 93  V15  V8  6.868448e-03
-    ## 198  V8 V15  6.868448e-03
-    ## 80  V18  V7  1.096080e-02
-    ## 245  V7 V18  1.096080e-02
-    ## 64  V18  V6  1.685366e-02
-    ## 244  V6 V18  1.685366e-02
-    ## 75  V13  V7  2.226474e-02
-    ## 165  V7 V13  2.226474e-02
-    ## 76  V14  V7  2.495908e-02
-    ## 181  V7 V14  2.495908e-02
-    ## 58  V12  V6  2.976763e-02
-    ## 148  V6 V12  2.976763e-02
-    ## 48  V18  V5  3.039554e-02
-    ## 243  V5 V18  3.039554e-02
-    ## 94  V16  V8  3.151990e-02
-    ## 214  V8 V16  3.151990e-02
-    ## 16  V18  V3  3.399229e-02
-    ## 241  V3 V18  3.399229e-02
-    ## 32  V18  V4  3.471370e-02
-    ## 242  V4 V18  3.471370e-02
-    ## 77  V15  V7  5.057870e-02
-    ## 197  V7 V15  5.057870e-02
-    ## 42  V12  V5  5.776866e-02
-    ## 147  V5 V12  5.776866e-02
-    ## 59  V13  V6  6.747652e-02
-    ## 164  V6 V13  6.747652e-02
-    ## 60  V14  V6  6.979727e-02
-    ## 180  V6 V14  6.979727e-02
-    ## 78  V16  V7  7.073540e-02
-    ## 213  V7 V16  7.073540e-02
-    ## 110 V16  V9  8.468169e-02
-    ## 215  V9 V16  8.468169e-02
-    ## 26  V12  V4  8.648627e-02
-    ## 146  V4 V12  8.648627e-02
-    ## 43  V13  V5  9.451287e-02
-    ## 163  V5 V13  9.451287e-02
-    ## 44  V14  V5  9.885903e-02
-    ## 179  V5 V14  9.885903e-02
-    ## 61  V15  V6  1.026381e-01
-    ## 196  V6 V15  1.026381e-01
-    ## 10  V12  V3  1.030351e-01
-    ## 145  V3 V12  1.030351e-01
-    ## 109 V15  V9  1.147219e-01
-    ## 199  V9 V15  1.147219e-01
-    ## 27  V13  V4  1.178949e-01
-    ## 162  V4 V13  1.178949e-01
-    ## 62  V16  V6  1.194054e-01
-    ## 212  V6 V16  1.194054e-01
-    ## 28  V14  V4  1.241983e-01
-    ## 178  V4 V14  1.241983e-01
-    ## 108 V14  V9  1.322268e-01
-    ## 183  V9 V14  1.322268e-01
-    ## 11  V13  V3  1.344638e-01
-    ## 161  V3 V13  1.344638e-01
-    ## 126 V16 V10  1.391958e-01
-    ## 216 V10 V16  1.391958e-01
-    ## 45  V15  V5  1.407743e-01
-    ## 195  V5 V15  1.407743e-01
-    ## 12  V14  V3  1.429167e-01
-    ## 177  V3 V14  1.429167e-01
-    ## 46  V16  V5  1.564412e-01
-    ## 211  V5 V16  1.564412e-01
-    ## 107 V13  V9  1.639146e-01
-    ## 167  V9 V13  1.639146e-01
-    ## 29  V15  V4  1.726335e-01
-    ## 194  V4 V15  1.726335e-01
-    ## 125 V15 V10  1.814315e-01
-    ## 200 V10 V15  1.814315e-01
-    ## 30  V16  V4  1.856449e-01
-    ## 210  V4 V16  1.856449e-01
-    ## 13  V15  V3  1.965496e-01
-    ## 193  V3 V15  1.965496e-01
-    ## 14  V16  V3  2.084224e-01
-    ## 209  V3 V16  2.084224e-01
-    ## 142 V16 V11  2.142505e-01
-    ## 217 V11 V16  2.142505e-01
-    ## 124 V14 V10  2.161269e-01
-    ## 184 V10 V14  2.161269e-01
-    ## 123 V13 V10  2.571587e-01
-    ## 168 V10 V13  2.571587e-01
-    ## 141 V15 V11  2.736163e-01
-    ## 201 V11 V15  2.736163e-01
-    ## 140 V14 V11  3.288391e-01
-    ## 185 V11 V14  3.288391e-01
-    ## 139 V13 V11  3.839772e-01
-    ## 169 V11 V13  3.839772e-01
-    ## 106 V12  V9  4.866057e-01
-    ## 151  V9 V12  4.866057e-01
-    ## 158 V16 V12  5.185012e-01
-    ## 218 V12 V16  5.185012e-01
-    ## 122 V12 V10  6.245366e-01
-    ## 152 V10 V12  6.245366e-01
-    ## 174 V16 V13  6.252448e-01
-    ## 219 V13 V16  6.252448e-01
-    ## 157 V15 V12  6.367865e-01
-    ## 202 V12 V15  6.367865e-01
-    ## 156 V14 V12  7.581948e-01
-    ## 186 V12 V14  7.581948e-01
-    ## 105 V11  V9  7.634087e-01
-    ## 135  V9 V11  7.634087e-01
-    ## 104 V10  V9  7.670907e-01
-    ## 119  V9 V10  7.670907e-01
-    ## 173 V15 V13  7.721509e-01
-    ## 203 V13 V15  7.721509e-01
-    ## 138 V12 V11  7.808912e-01
-    ## 153 V11 V12  7.808912e-01
-    ## 190 V16 V14  7.821848e-01
-    ## 220 V14 V16  7.821848e-01
-    ## 155 V13 V12  8.257722e-01
-    ## 170 V12 V13  8.257722e-01
-    ## 6    V8  V3  8.596197e-01
-    ## 81   V3  V8  8.596197e-01
-    ## 22   V8  V4  8.835113e-01
-    ## 82   V4  V8  8.835113e-01
-    ## 189 V15 V14  9.063742e-01
-    ## 204 V14 V15  9.063742e-01
-    ## 38   V8  V5  9.161984e-01
-    ## 83   V5  V8  9.161984e-01
-    ## 121 V11 V10  9.195888e-01
-    ## 136 V10 V11  9.195888e-01
-    ## 5    V7  V3  9.252738e-01
-    ## 65   V3  V7  9.252738e-01
-    ## 172 V14 V13  9.316609e-01
-    ## 187 V13 V14  9.316609e-01
-    ## 206 V16 V15  9.434600e-01
-    ## 221 V15 V16  9.434600e-01
-    ## 21   V7  V4  9.445043e-01
-    ## 66   V4  V7  9.445043e-01
-    ## 54   V8  V6  9.478600e-01
-    ## 84   V6  V8  9.478600e-01
-    ## 4    V6  V3  9.631489e-01
-    ## 49   V3  V6  9.631489e-01
-    ## 37   V7  V5  9.686758e-01
-    ## 67   V5  V7  9.686758e-01
-    ## 70   V8  V7  9.745767e-01
-    ## 85   V7  V8  9.745767e-01
-    ## 20   V6  V4  9.770299e-01
-    ## 50   V4  V6  9.770299e-01
-    ## 3    V5  V3  9.857296e-01
-    ## 33   V3  V5  9.857296e-01
-    ## 53   V7  V6  9.882944e-01
-    ## 68   V6  V7  9.882944e-01
-    ## 36   V6  V5  9.918206e-01
-    ## 51   V5  V6  9.918206e-01
-    ## 19   V5  V4  9.942214e-01
-    ## 34   V4  V5  9.942214e-01
-    ## 2    V4  V3  9.961768e-01
-    ## 17   V3  V4  9.961768e-01
-    ## 1    V3  V3  1.000000e+00
-    ## 18   V4  V4  1.000000e+00
-    ## 35   V5  V5  1.000000e+00
-    ## 52   V6  V6  1.000000e+00
-    ## 69   V7  V7  1.000000e+00
-    ## 86   V8  V8  1.000000e+00
-    ## 103  V9  V9  1.000000e+00
-    ## 120 V10 V10  1.000000e+00
-    ## 137 V11 V11  1.000000e+00
-    ## 154 V12 V12  1.000000e+00
-    ## 171 V13 V13  1.000000e+00
-    ## 188 V14 V14  1.000000e+00
-    ## 205 V15 V15  1.000000e+00
-    ## 222 V16 V16  1.000000e+00
-    ## 239 V17 V17  1.000000e+00
-    ## 256 V18 V18  1.000000e+00
 
 Ensuite on peut afficher à l’aide d’une heatmap, notre matrice de
 corrélation.
@@ -640,12 +381,12 @@ ggplot(melt_data, aes(x = x, y = y)) +
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 On retrouve nos fortes corrélations observées auparavant sur les
 variables 3 à 8. On peut aussi observer des fortes corrélations entre
-les variables 9 à 16. Il est donc important de prendre ces variables en
-compte lors de notre analyse.
+les variables 9 à 16.
 
 Cependant on peut remarquer qu’il n’y a pas ou une très faible
 corrélation entre les variables qui constituent les résultats de la
-détection MA (V3-V8) et ceux des exsudats (V9-V16).
+détection MA (V3-V8) et ceux des exsudats (V9-V16). Il est donc
+important de prendre ces variables en compte lors de notre analyse.
 
 On peut visualiser la matrice de corrélation d’une autre manière, en y
 ajoutant un dendrogramme. Ce qui peut être intéressant pour voir les
@@ -690,7 +431,6 @@ On s’intéresse donc maintenant à une brève analyse des nuages de points
 entre les variables.
 
 ``` r
-library(ggplot2)
 #Analyse des nuages de points
 for (i in 3:17){
     g <- ggplot(data, aes(x = data[,i], y = data[,i+1]))
@@ -703,9 +443,8 @@ for (i in 3:17){
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-3.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-4.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-5.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-6.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-7.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-8.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-9.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-10.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-11.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-12.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-13.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-14.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-15.png)<!-- -->
 Ces graphiques nous aident à voir que en observant certains nuages de
 points, il est aisé de différencier les points concernants une personne
-malade d’une personne saine. On pourrait même placer des valeurs seuils.
-Ce qui nous conforte dans l’idée d’utiliser un arbre de décision pour
-effectuer nos prédictions par la suite.
+malade d’une personne saine. Ce qui nous conforte dans l’idée qu’une
+classification supervisée peut mener à de bon résultat.
 
 Nous allons maintenant passer à l’étape suivante du projet.
 
@@ -1385,7 +1124,7 @@ library(xgboost)
 boostedtree <- xgboost(data = X_train, label = y_train, eta = .3, nrounds = 25, max.depth = 8, objective = 'binary:logistic')
 ```
 
-    ## [20:04:05] WARNING: amalgamation/../src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+    ## [10:43:06] WARNING: amalgamation/../src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
     ## [1]  train-logloss:0.590588 
     ## [2]  train-logloss:0.522922 
     ## [3]  train-logloss:0.477219 
