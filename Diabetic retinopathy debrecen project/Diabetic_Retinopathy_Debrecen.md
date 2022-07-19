@@ -13,7 +13,7 @@ l’analyse de ce dataset, ainsi que la création d’un modèle prédictif
 sont très intéressants pour moi.
 
 De plus le *diabetic retinopathy debrecen dataset* nous fournit un
-nombre suffisant d’individus et de varible pour mener à bien cette
+nombre suffisant d’individu et de varible pour mener à bien cette
 analyse (ce qui devrait nous éviter d’être en underfitting ou
 overfitting). Il semblerait qu’il n’y ait pas de valeurs manquantes dans
 le dataset (même si nous allons le vérifier par la suite).
@@ -24,13 +24,13 @@ faut séparer les cas des patients sains de ceux malades.
 L’ensemble des données contient des caractéristiques extraites des
 images *Messidor* dans le but de prédire si une personne est atteinte de
 rétinopathie diabétique. Toutes les caractéristiques représentent soit
-une lésion détectée, soit une caratéristique descriptive d’une partie
+une lésion détectée, soit une caractéristique descriptive d’une partie
 anatomique, soit un descripteur au niveau de l’image.
 
 # Analyse descriptive
 
-Les informations qui nous sont fournis sur le dataset sont les suivantes
-:
+Les informations qui nous sont fournies sur le dataset sont les
+suivantes :
 
 V1) Le résultat binaire de l’évaluation de la qualité. 0 = mauvaise
 qualité 1 = qualité suffisante.
@@ -50,7 +50,7 @@ le diamètre de la ROI pour compenser des images de différentes tailles.
 
 V17) La distance euclidienne du centre de la macula et le centre du
 disque optique pour fournir des informations importantes concernant
-l’état du patient. Cette fonctionnalité est également normalisé avec le
+l’état du patient. Cette fonctionnalité est également normalisée avec le
 diamètre de la ROI.
 
 V18) Le diamètre du disque optique.
@@ -64,7 +64,7 @@ Dans un premier temps, nous allons procéder à une analyse descriptive
 des données. En particulier, la distribution des différentes variables,
 et des liens ou des dépendances entres celles-ci.
 
-Pour cela il nous faut commencer par charger nos données dans un
+Pour cela, il nous faut commencer par charger nos données dans un
 dataframe. Ce qui facilite énormément les manipulation.
 
 ``` r
@@ -90,13 +90,14 @@ head(data)
 
 Ce tableau nous permet d’observer notre dataset de manière globale dans
 un premier temps. Il nous donne un aperçu des valeurs prisent par chaque
-variables, ainsi que leur type (int, num…). Les variables 1, 2, 19 et 20
+variable, ainsi que leur type (int, num…). Les variables 1, 2, 19 et 20
 sont des variables de type catégorielles prenant des valeurs entre
-{0,1}. Pour en être sûr nous allons vérifier les valeurs uniques de ces
+{0,1}. Pour en être sûr, nous allons vérifier les valeurs uniques de ces
 variables.
 
 ``` r
-vec <- c(1,2,19,20) #Numéro des colonnes qui semble être catégorielles
+#Numéros des colonnes qui semble être catégorielles
+vec <- c(1,2,19,20) 
 for (i in vec) {
   print(unique(data[,i]))
 }
@@ -113,7 +114,7 @@ sur le site du dataset, nous savons que la dernière variable est celle
 du résultat de l’analyse. Elle nous indique si un patient est malade ou
 sain.
 
-Désormais nous allons convertir le type de ces 4 variables en un type
+Désormais, nous allons convertir le type de ces 4 variables en un type
 catégorielle (à savoir en factor pour le langage R).
 
 ``` r
@@ -133,9 +134,9 @@ sapply(data, class)
     ## "numeric" "numeric"  "factor"  "factor"
 
 Maintenant que nous avons le bon type pour chacune de nos variables,
-nous pouvons vérifer si nous avons des valeurs nulles. La commande str()
-nous donne de nouveau des informations sur les valeurs et le type de
-chaque variables. Sachant que dans la description du dataset, il y a
+nous pouvons vérifier si nous avons des valeurs nulles. La commande
+str() nous donne de nouveau des informations sur les valeurs et le type
+de chaque variable. Sachant que dans la description du dataset, il y a
 indiqué 1151 observations et aucune valeur manquante.
 
 ``` r
@@ -165,7 +166,7 @@ str(data)
     ##  $ V19: Factor w/ 2 levels "0","1": 2 1 1 1 1 1 1 2 1 1 ...
     ##  $ V20: Factor w/ 2 levels "0","1": 1 1 2 1 2 2 2 1 2 2 ...
 
-Il n’y a pas de valeurs nulle dans notre dataset. De plus chaque
+Il n’y a pas de valeurs nulles dans notre dataset. De plus, chaque
 variable possède désormais le bon type. Nous allons pouvoir procéder à
 l’analyse préliminaire de nos données.
 
@@ -224,15 +225,15 @@ part des autres dans notre dataset.
 On ne retrouve pas ces similarités dans les variables de type “num”.
 
 Pour les variables 1 et 2, on peut remarquer que le nombre de 0 est très
-faible. Ce qui met en valeur le faible nombre d’évaluation de mauvaise
-qualité. Cela nous indique aussi que la majorité des patients ont eu un
+faible. Ce qui met en valeur le faible nombre d’évaluation de mauvaises
+qualités. Cela nous indique aussi que la majorité des patients ont eu un
 résultat positif au pré-dépistage. Alors que pour la variable 20, on
 peut voir que l’on à peu près le même nombre de patients malades que
 sains. On peut donc en conclure sur la faible efficacité du
 pré-dépistage.
 
 On peut observer le nombre en % de cas malades/sains, afin d’avoir une
-meilleur visibilité sur la variable 20.
+meilleurs visibilité sur la variable 20.
 
 ``` r
 #On visualise le nombre de cas positif et négatif de notre dataset
@@ -246,17 +247,17 @@ pie(my_count, labels = lbls, main = "Répartition des individus malades/sains", 
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
-Ici en rouge, les patients negatifs au RD, et en bleu les patients
+Ici en rouge, les patients négatifs au RD, et en bleu les patients
 positifs au RD. Ce qui veut dire que les classes sont équilibrées. Cela
-nous facilitera la tâche lors de la classification supervisé, car nous
-n’auront pas à jouer sur les poids des classes pour rééquilibrer des
+nous facilitera la tâche lors de la classification supervisée, car nous
+n’aurons pas à jouer sur les poids des classes pour rééquilibrer des
 classes disproportionnées.
 
 Sachant que la variable 20 constitue notre “target”, nous allons
 analyser la répartition des autres variables en fonction de celle-ci.
-Pour cela nous utilisons des boxplots. En séparant les cas sains des cas
-malades.(Il suffit de cliquer sur un des graphiques pour l’afficher en
-version grande plus bas).
+Pour cela, nous utilisons des boxplots. En séparant les cas sains des
+cas malades.(Il suffit de cliquer sur un des graphiques pour l’afficher
+en version grande plus bas).
 
 ``` r
 library(ggplot2)
@@ -277,15 +278,15 @@ for (i in 3:17){
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-4.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-5.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-6.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-7.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-8.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-9.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-10.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-11.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-12.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-13.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-14.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-7-15.png)<!-- -->
 Ces boxplots sont très intéressants à analyser. Car ils nous donnent des
-informations sur la répartitions des valeurs par variable, et en
-fonction de la variable “target”. On peut voir pour les variables 3 à 8
-une légère différence de la répartition des valeurs entre un patient
-sain et un malade. Il semblerait que les patients malades aient des
-résultats plus élevés à la détection MA.
+informations sur la répartition des valeurs par variable, et en fonction
+de la variable “target”. On peut voir pour les variables 3 à 8 une
+légère différence de la répartition des valeurs entre un patient sain et
+un malade. Il semblerait que les patients malades aient des résultats
+plus élevés à la détection MA.
 
 On remarque aussi que pour certaines variables (12 à 16), les patients
 malades semblent plus souvent répertoriés comme des “outliers” (valeurs
-abérantes).
+aberrantes).
 
 Nous allons donc maintenant nous intéresser d’un peu plus près au
 variable 3 à 8.
@@ -320,12 +321,12 @@ variables 3 à 8 :
 Tout d’abord, elles ont toutes la même distribution. Ce qui semble
 logique puisqu’elles sont toutes liées à un test commun.
 
-Ensuite, ces variables ont de très forte corrélation (positive). Ce qui
-veut dire qu’il y a de fortes dépendances entre ces variables.
+Ensuite, ces variables ont de très fortes corrélations (positives). Ce
+qui veut dire qu’il y a de fortes dépendances entre ces variables.
 
 On peut donc s’intéresser aux corrélations entre toutes les variables de
-notre dataset. Pour calculer une matrice de corrélation il nous faut
-uniquement des valeurs numérique. On peut donc enlever les variables
+notre dataset. Pour calculer une matrice de corrélation, il nous faut
+uniquement des valeurs numériques. On peut donc enlever les variables
 catégorielles de notre dataset. Sachant qu’il serait très peu pertinent
 de les inclure dans l’analyse, puisqu’elles constituent les résultats
 d’analyses postérieurs à celles des variables 3 à 18.
@@ -344,7 +345,7 @@ ncol(corr_data)
 On a bien que les 16 colonnes de notre dataset, qui sont de type
 “numeric”.
 
-On peut donc construire notre matrice de corrélation. Pour cela on
+On peut donc construire notre matrice de corrélation. Pour cela, on
 construit d’abord un tableau contenant la corrélation entre chaque
 combinaisons de variables possibles.
 
@@ -383,7 +384,7 @@ On retrouve nos fortes corrélations observées auparavant sur les
 variables 3 à 8. On peut aussi observer des fortes corrélations entre
 les variables 9 à 16.
 
-Cependant on peut remarquer qu’il n’y a pas ou une très faible
+Cependant, on peut remarquer qu’il n’y a pas ou une très faible
 corrélation entre les variables qui constituent les résultats de la
 détection MA (V3-V8) et ceux des exsudats (V9-V16). Il est donc
 important de prendre ces variables en compte lors de notre analyse.
@@ -398,12 +399,12 @@ heatmap(corr_data, scale = "column", margins = c(2,2))
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
-On observe 3 groupes, les deux précédemments observés et un autre qui
-est formé des variables 17 et 18. Ce dendrogramme nous montre aussi
-qu’il pourrait être intéressant de regarder le nuage de points entre
-deux variables qui se suivent (par exemple V13 et V14), car il
-semblerait que dans notre cas, les premiers duo sont réalisé de cette
-manière par le dendrogramme.
+On observe 3 groupes, les deux précédemment observés et un autre qui est
+formé des variables 17 et 18. Ce dendrogramme nous montre aussi qu’il
+pourrait être intéressant de regarder le nuage de points entre deux
+variables qui se suivent (par exemple V13 et V14), car il semblerait que
+dans notre cas, les premiers duos sont réalisé de cette manière par le
+dendrogramme.
 
 On peut aussi s’intéresser à la distribution des variables.
 
@@ -424,8 +425,8 @@ for (i in 3:18){
 On peut remarquer que le groupe V3-V8 suit une même distribution, qu’il
 en est de même pour le groupe V9-V16 et le groupe V17-V18.
 
-On peut en conclure que nous ne sommes pas en présence de distribution
-normale.
+De plus, on peut en conclure que nous ne sommes pas en présence de
+distribution normale.
 
 On s’intéresse donc maintenant à une brève analyse des nuages de points
 entre les variables.
@@ -441,10 +442,10 @@ for (i in 3:17){
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-3.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-4.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-5.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-6.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-7.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-8.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-9.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-10.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-11.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-12.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-13.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-14.png)<!-- -->![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-14-15.png)<!-- -->
-Ces graphiques nous aident à voir que en observant certains nuages de
-points, il est aisé de différencier les points concernants une personne
+Ces graphiques nous aident à voir qu’en observant certains nuages de
+points, il est aisé de différencier les points concernant une personne
 malade d’une personne saine. Ce qui nous conforte dans l’idée qu’une
-classification supervisée peut mener à de bon résultat.
+classification supervisée peut mener à de bons résultats.
 
 Nous allons maintenant passer à l’étape suivante du projet.
 
@@ -454,7 +455,7 @@ Dans cette partie, nous allons supprimer la variable classe de notre
 dataset. Dans le but d’utiliser trois méthodes vu en cours : KMeans, PAM
 et CAH.
 
-Pour chaque méthodes, nous déterminerons le bon nombre de profil type,
+Pour chaque méthode, nous déterminerons le bon nombre de profils type,
 en extraire les profils et les interpréter.
 
 ``` r
@@ -550,8 +551,8 @@ best_km
     ## 8        9 123.97341       TRUE
     ## 9       10  69.89303       TRUE
 
-On va observer sur un graphique afin d’avoir une meilleur compréhension
-du résultat.
+Nous allons observer sur un graphique cette méthode, afin d’avoir une
+meilleur compréhension du résultat.
 
 ``` r
 PlotHartigan(best_km)
@@ -559,14 +560,14 @@ PlotHartigan(best_km)
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 Ce qui nous indique ces résultats, c’est qu’il faut faudrait ajouter des
-clusters afin de répondre à la métrics d’Hartigan et afin d’avoir un
+clusters afin de répondre à la métrique d’Hartigan et afin d’avoir un
 clustering plus précis. Cependant le nombre de clusters devenant trop
-éléver, alors qu’initialement il n’y a que deux classes dans le dataset,
-nous allons rester sur nos précedents résultats. De plus, on observe ici
+élever, alors qu’initialement il n’y a que deux classes dans le dataset,
+nous allons rester sur nos précédents résultats. De plus, on observe ici
 un grand changement lors du passage à 4 clusters. Ce qui nous conforte
 dans l’utilisation de la méthode du coude pour notre démarche.
 
-On utilise donc l’agorithme du KMeans avec 4 clusters.
+On utilise donc l’algorithme du KMeans avec 4 clusters.
 
 ``` r
 #A l'aide de la methode du coude on peut dire que le meilleur k est 4 
@@ -638,19 +639,19 @@ km_data
     ## [6] "betweenss"    "size"         "iter"         "ifault"
 
 Les informations ci-dessus nous donne accès aux barycentres de chaque
-variable, l’assignation de chaque individus à son cluster et la
-précision de notre clustering en regardant le ratio inter. Ce ratio
-inter est de 71,9%, ce qu’on peut considérer comme un résultat correct.
+variable, l’assignation de chaque individu à son cluster et la précision
+de notre clustering en regardant le ratio inter. Ce ratio inter est de
+71,9%, ce qu’on peut considérer comme un résultat correct.
 
 Car le KMeans a ses limites et il est possible que dans notre dataset,
-il n’y est pas de groupes distincts qui se déssinent. Afin de vérifier
+il n’y est pas de groupes distincts qui se dessinent. Afin de vérifier
 cela nous pouvons afficher graphiquement les résultats de notre
 clustering.
 
-Cependant celui-ci peut être difficile en raison de la nature
+Cependant, celui-ci peut être difficile en raison de la nature
 dimensionnelle élevée des données. Pour surmonter ce problème, la
-focntion plot effectue une mise à l’échelle multidimensionnelle pour
-projeter les données en deux dimensions. Elle utilise l’agorithme des
+fonction plot effectue une mise à l’échelle multidimensionnelle pour
+projeter les données en deux dimensions. Elle utilise l’algorithme des
 PCA, et affiche sur les deux composantes principales les plus
 importantes.
 
@@ -673,9 +674,9 @@ plot(table(data$V20, km_data$cluster), main="Matrice de confusion", xlab = "V20"
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 On remarque que nos clusters 1 et 2 possèdent plus d’individus que les
-clusters 3 et 4. Le clusters 4 possèdent peu d’individus négatifs. Il
+clusters 3 et 4. Le clusters 4 possède peu d’individus négatifs. Il
 semblerait que ce clusters représente le mieux les individus positifs.
-Cependant il faut prendre en compte qu’elle reprèsente un total
+Cependant, il faut prendre en compte qu’elle représente un total
 d’individus assez faible. Et que les clusters 1 et 2 représentes de
 nombreux individus positifs. Nous pouvons donc en conclure qu’il est
 difficile de reproduire la distinction entre individus malades et sains
@@ -684,7 +685,7 @@ avec l’algorithme des KMeans.
 On peut aussi réaliser un autre KMeans, avec seulement 2 clusters,
 puisque nous savons que notre variable cible classifie nos patients en
 deux catégories : malade ou sain. On analyse ensuite avec ce même
-graphique l’éfficacité de notre algorithme.
+graphique l’efficacité de notre algorithme.
 
 ``` r
 #Test avec deux clusters pour reproduire notre variable "target"
@@ -753,14 +754,14 @@ plot(km_data2, data = data, class = "V20")
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
-Les résultats obtenus ne sont pas bon, puisque nous avons seulement un
-résultat de 42,3% pour le ratio inter. De plus si on regarde le
+Les résultats obtenus ne sont pas bons, puisque nous avons seulement un
+résultat de 42,3% pour le ratio inter. De plus, si on regarde le
 graphique obtenu, on peut voir qu’il y a une faible corrélation entre
 les couleurs (signification de notre clustering) et les formes
 (signification des classes réelles), ce qui nous indique un mauvais
 clustering.
 
-Afin de vérifier cela nous utilisons une matrice de confusion.
+Afin de vérifier cela, nous utilisons une matrice de confusion.
 
 ``` r
 plot(table(data$V20, km_data2$cluster), main="Matrice de confusion", xlab = "V20", ylab = "Clusters")
@@ -774,10 +775,10 @@ plot(table(data$V20, km_data2$cluster), main="Matrice de confusion", xlab = "V20
 
 Cette matrice nous montre que notre cluster 1 correspond trop peu
 d’élément de la classe 0 (équivalent au cluster 1). Si les résultats
-étaient bon, la diagonale de la matrice aurait de fortes valeurs.
+étaient bons, la diagonale de la matrice aurait de fortes valeurs.
 
-L’un des problème pour le clustering avec l’algorithme KMeans est qui
-est sensible au outliers (valeurs abérantes). Et lors de notre analyse
+L’un des problèmes pour le clustering avec l’algorithme KMeans est qui
+est sensible au outliers (valeurs aberrantes). Et lors de notre analyse
 descriptive, nous avons grâce aux boxplots, que notre jeu de donné
 possède des outliers.
 
@@ -850,8 +851,8 @@ build et du swap de la fonction objective. On remarque, que nos
 résultats ne s’améliorent que très peu après la deuxième étape de
 l’algorithme (le swap).
 
-On va maintenant observer la silhoutte de notre clustering, ce qui nous
-donnera plus d’information sur l’éfficacité de notre algorithme.
+On va maintenant observer la silhouette de notre clustering, ce qui nous
+donnera plus d’information sur l’efficacité de notre algorithme.
 
 ``` r
 #Afin d'afficher graphiquement le résultat, on utilise la fonction silhoutte
@@ -862,15 +863,15 @@ plot(sil, main = "", border = NA)
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 Nous savons que plus l’average width est élevée, plus notre clustering
-est bon. Or dans notre cas, elle est de 0.33. Un consensus scientifique
+est bon. Or, dans notre cas, elle est de 0.33. Un consensus scientifique
 autour de la valeur silhouette nous dit qu’une valeur de 0.33 correspond
 à une structure faible, presque une structure artificielle.
 
 Il nous faut donc utiliser une autre méthode. Il est possible que nos
-classes ne soient pas linéairement séparable.
+classes ne soient pas linéairement séparables.
 
 On utilise donc une dernière méthode de clustering. La classification
-hiérachique ascendante (CAH). Cette méthode construit des clusters dans
+hiérarchique ascendante (CAH). Cette méthode construit des clusters dans
 des clusters. Elle ne requière pas d’un nombre initial de clusters.
 Cette méthode peut être vue comme un arbre, représenté graphiquement par
 un dendrogramme.
@@ -886,13 +887,13 @@ rect.hclust(hc_data, k = 8, border = "blue")
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
-On observe que avec 4 clusters, chacun d’entre eux possèdent un poids
-élevé. Afin de réalisé un test nous avons aussi regardé avec 8 clusters.
-Le poids semble être divisé par deux, mais pour cela nous avons du
-doubler le nombre de clusters. Cela n’est pas donc pas intéressant dans
-notre cas. Nos 4 clusters on un poids très élevé, ce qui ne permet pas
-de dire que nous avons un bon clustering. Peut importe la méthode nos
-résultats sont mauvais.
+On observe qu’avec 4 clusters, chacun d’entre eux possèdent un poids
+élevé. Afin de réaliser un test nous avons aussi regardé avec 8
+clusters. Le poids semble être divisé par deux, mais pour cela, nous
+avons dû doubler le nombre de clusters. Cela n’est pas donc pas
+intéressant dans notre cas. Nos 4 clusters ont un poids très élevé, ce
+qui ne permet pas de dire que nous avons un bon clustering. Peut importe
+la méthode nos résultats sont mauvais.
 
 On en déduit que la classification non supervisé ne marche pas. Cela
 peut s’expliquer par le fait que certaines variables n’ont pas de
@@ -904,7 +905,7 @@ regarde variable par variable. Ce qui nous amène au point suivant.
 
 # Classification supervisée
 
-Dans cette partie nous allons procéder à l’apprentissage d’un arbre de
+Dans cette partie, nous allons procéder à l’apprentissage d’un arbre de
 classification pour la prédiction de la variable classe en fonction des
 variables restantes.
 
@@ -945,7 +946,7 @@ dataset en un trainset et un testset, dans le but de vérifier les
 résultats de notre algorithme.
 
 ``` r
-#Taille du train
+#Définition de pourcentage de données alloué à l'entraînement
 smp_size <- floor(0.8 * nrow(data))
 
 #On donne seed pour obtenir tout le temps la même partition
@@ -978,16 +979,16 @@ rpart.plot(fit)
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
-Grâce à cette arbre nous pouvons visualiser les principales règles. On
-peut voir sur chaque feuilles la classe majoritaire de la feuille (0 ou
+Grâce à cet arbre, nous pouvons visualiser les principales règles. On
+peut voir sur chaque feuille la classe majoritaire de la feuille (0 ou
 1), ainsi que le pourcentage d’individus total de la feuille. On
 remarque que nous avons 7 règles de décisions, et que nous avons donc 8
-feuilles à notre arbre. Dont 5 correspondants à la classe 1 (individus
-malade) et 3 correspondants à la classe 0 (individus sain).
+feuilles à notre arbre. Dont 5 correspondants à la classe 1 (individu
+malade) et 3 correspondants à la classe 0 (individu sain).
 
 Une autre visualisation est possible, moins complète, mais qui met plus
-en valeur les régles de l’arbre et les classes obtenues suite a ces
-régles.
+en valeur les règles de l’arbre et les classes obtenues suite a ces
+règles.
 
 ``` r
 #On peut réaliser une autre méthode d'affichage
@@ -996,7 +997,7 @@ text(fit)
 ```
 
 ![](Diabetic_Retinopathy_Debrecen_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
-De plus les règles sont données avec une plus grande précision après la
+De plus, les règles sont données avec une plus grande précision après la
 virgule. On peut maintenant afficher notre arbre sans utiliser de
 graphique, afin d’avoir plus d’information sur les règles obtenus.
 
@@ -1026,16 +1027,16 @@ fit
     ##      5) V15>=0.061455 57  11 1 (0.1929825 0.8070175) *
     ##    3) V3>=55.5 226  50 1 (0.2212389 0.7787611) *
 
-On remaque les feuilles obtenus sur les 920 individus utilisés pour
-notre apprentissage, certaines ont très bien classées les individus, et
-la classe majortiaire de la feuille est supérieur à 70%. Alors que
-certaines feuilles ont moins bien classés les individus.
+On remarque que sur les feuilles obtenues sur les 920 individus utilisés
+pour notre apprentissage, certaines ont très bien classées les
+individus, et la classe majoritiaire de la feuille est supérieur à 70%.
+Alors que certaines feuilles ont moins bien classés les individus.
 
-Cette affichage nous montre : la règle, le nombre d’individus de la
-classe majoritaire, puis le nombre d’individus de la classe minoritaire.
-Enfin nous avons la probabilité d’appartenance à une classe. Par exemple
-pour la règle 3 qui nous dit que la variable V3 doit être supérieur à
-55.5, nous avons une probabilité de 78% d’être dans la classe 1.
+Cet affichage nous montre : la règle, le nombre d’individus de la classe
+majoritaire, puis le nombre d’individus de la classe minoritaire. Enfin
+nous avons la probabilité d’appartenance à une classe. Par exemple pour
+la règle 3 qui nous dit que la variable V3 doit être supérieur à 55.5,
+nous avons une probabilité de 78% d’être dans la classe 1.
 
 On peut maintenant s’intéresser à la performance de notre arbre. Pour
 cela nous utilisons une matrice de confusion.
@@ -1096,7 +1097,7 @@ X_test <- as.matrix(testset[-20])
 y_test <- as.matrix(testset[20])
 ```
 
-Maintenant que nous avons nos matrices, contenant nos variables dans un
+Maintenant que nous avons nos matrices, contenant nos variables dans une
 première matrice et notre variables target dans une seconde. Nous
 pouvons utiliser l’algorithme xgboost afin de réaliser un arbre de
 décision par boostrap.
@@ -1107,10 +1108,10 @@ l’overfitting en rendant le processus de boosting plus conservateur. Une
 valeur plus faible pour eta implique une valeur plus grande pour
 nrounds. Une valeur eta faible signifie un modèle plus robuste au
 surajustement mais plus lent à calculer. nrounds nous permet de fixer le
-nombre d’itération que l’agorithme fait. Enfin max.depth nous permet de
+nombre d’itération que l’algorithme fait. Enfin max.depth nous permet de
 contrôler la profondeur maximale de l’arbre.
 
-En jouant sur ces hyperparamètre, nous pouvons améliorer les
+En jouant sur ces hyperparamètres, nous pouvons améliorer les
 performances de notre algorithme.
 
 ``` r
@@ -1124,7 +1125,7 @@ library(xgboost)
 boostedtree <- xgboost(data = X_train, label = y_train, eta = .3, nrounds = 25, max.depth = 8, objective = 'binary:logistic')
 ```
 
-    ## [10:43:06] WARNING: amalgamation/../src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
+    ## [23:40:33] WARNING: amalgamation/../src/learner.cc:1115: Starting in XGBoost 1.3.0, the default evaluation metric used with the objective 'binary:logistic' was changed from 'error' to 'logloss'. Explicitly set eval_metric if you'd like to restore the old behavior.
     ## [1]  train-logloss:0.590588 
     ## [2]  train-logloss:0.522922 
     ## [3]  train-logloss:0.477219 
@@ -1152,9 +1153,9 @@ boostedtree <- xgboost(data = X_train, label = y_train, eta = .3, nrounds = 25, 
     ## [25] train-logloss:0.127601
 
 On utilisant l’algorithme de xgboost, nous arrivons au bout de 25
-iterations à grandement améliorer les résulats de notre apprentissage.
+itérations à grandement améliorer les résultats de notre apprentissage.
 Nous arrivons à une erreur moyenne de 12% seulement. Ce qui représente
-de bon résultat.
+de bons résultats.
 
 On peut donc maintenant regarder les variables les plus importantes lors
 de l’apprentissage de notre arbre. Afin de comprendre quelles variables
@@ -1237,11 +1238,11 @@ deep learning.
 # Conclusion
 
 Pour conclure, nous avons dans ce projet une approche complète pour
-traiter un jeu de données. En procédent dans un premier temps par une
+traiter un jeu de données. En procédant dans un premier temps par une
 analyse statistique des données, afin de mieux les comprendre, et de
 mieux aborder les étapes suivantes du projet. Nous n’avons pratiquement
 pas eu de pré-traitement des données à faire, ce qui m’a permis de me
-concentrer sur les aspects vus en cours. Dans un deuxième temps nous
+concentrer sur les aspects vus en cours. Dans un deuxième temps, nous
 avons abordé le sujet du clustering, en supprimant notre variable
 target, et en utilisant des algorithmes d’apprentissages non supervisés
 comme KMeans, PAM et CAH. Malheureusement les résultats n’ont pas été
@@ -1252,12 +1253,12 @@ les résultats sont moindres avec cet algorithme. Nous en avons conclu
 que les classes sont non linéairement séparables. Ce qui rend la tâche
 d’apprentissage non supervisé très compliqué. Une ouverture sur ce
 problème, est le deep learning où des méthodes commencent à émerger.
-Enfin dans un troisième temps, nous avons réalisé une classification
+Enfin, dans un troisième temps, nous avons réalisé une classification
 supervisée. Avec tout d’abord un arbre de décision, afin de voir les
-règles obtenus par notre arbre, ainsi que la répartition de chaque
-classes dans les feuilles obtenues. Les résultats n’étant pas
+règles obtenues par notre arbre, ainsi que la répartition de chaque
+classe dans les feuilles obtenues. Les résultats n’étant pas
 suffisamment efficaces, nous avons procédé à une méthode par boostrap.
-Sur laquelle nous avons obtenu de meilleur résultats (89% de précision
+Sur laquelle nous avons obtenu de meilleurs résultats (89% de précision
 avec 20 itérations). Ce projet m’a permis de mettre en application les
 concepts vus en cours et de me familiariser avec le langage R, un
 langage nouveau pour moi.
