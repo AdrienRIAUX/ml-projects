@@ -1,0 +1,68 @@
+---
+title: "House price project"
+author : "Adrien Riaux"
+date : "01/08/2022"
+output: rmarkdown::github_document
+---
+
+# House price project
+
+```{r}
+#Import 
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(lubridate)
+```
+
+
+```{r}
+df = read.csv("house_price.csv", header = TRUE, sep = ",")
+head(df)
+```
+We can observe that our dataframe contains date, but there store as characters. Moreover, it seems that the propertyType and bedrooms columns are categorical features. To verify that, we observe the number of unique value for these features.
+
+```{r}
+#Check unique value of categorical features
+for (i in c("propertyType", "bedrooms")) {
+  print(unique(df[,i]))
+}
+```
+
+Well, we have only to possible values for properyType and 6 for bedrooms. Use propertyType as factor would be interesting but we will keep bedrooms as int, because there are an order in this features. Have 3 bedrooms is better than only 2 for example.
+
+So we can now convert propertyType and datesold features into appropriate types.
+
+```{r}
+#Convert type
+df[, "propertyType"] <- as.factor(df[, "propertyType"])
+df[, "datesold"] <- as.Date(df[, "datesold"])
+
+sapply(df, class)
+```
+
+```{r}
+#Data description
+summary(df)
+```
+
+We have no null values in the dataframe.
+
+### Exploratory data analysis
+
+```{r}
+ggplot(data = df) + geom_histogram(aes(x = postcode))
+```
+
+```{r}
+ggplot(data = df, aes(x = propertyType, y = price)) + geom_boxplot()
+```
+
+```{r}
+#Create month and year columns
+df$year <- year(df$datesold)
+df$month <- month(df$datesold, label = TRUE)
+
+ggplot(df, aes(x = year, y = price)) + geom_line()
+```
+
