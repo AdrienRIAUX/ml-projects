@@ -10,5 +10,6 @@ Academic project :
 Kaggle project : 
 - Heart disease project
 - Spam email detection project
-- Star classification project (work in progress)
-- Churn prediction project (work in progress)
+- Star classification project
+- Churn prediction project
+- House price project (work in progress)
