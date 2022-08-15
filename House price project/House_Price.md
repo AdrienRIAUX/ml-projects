@@ -48,7 +48,13 @@ library(lubridate)
     ## 
     ##     date, intersect, setdiff, union
 
+We have several columns : - datesold : date of the property sale -
+postcode : postal code of the property - price : sale price of the
+property - propertyType : unit or house - bedrooms : number of bedrooms
+per property
+
 ``` r
+#Read data
 df = read.csv("house_price.csv", header = TRUE, sep = ",")
 head(df)
 ```
@@ -115,30 +121,84 @@ summary(df)
     ##  3rd Qu.:4.00  
     ##  Max.   :5.00
 
-We have no null values in the dataframe.
+We have no null values in the dataframe. Moreover postcode is only 4
+digits reference, we don’t expect that this data will be useful in this
+form. We will probably transform it into a categorical class.
 
 ### Exploratory data analysis
 
 ``` r
-ggplot(data = df) + geom_histogram(aes(x = postcode))
+#Plot density of postcode per propertyType
+ggplot(data = df, aes(x = postcode)) + #Add histogram
+  geom_histogram(aes(
+    y = ..density.., 
+    fill = propertyType, 
+    color = propertyType
+  ), 
+  alpha = 0.3, position = "identity") + 
+  geom_density(aes(color = propertyType), size = 0.7)
 ```
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](House_Price_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> We have
+two group of postcode. But neither match with a propertyType. It could
+be interesting to create a categorical feature for the postcode and
+check if they are a place where the price is higher. It can be
+interpreted like neighbourhoods.
 
 ``` r
-ggplot(data = df, aes(x = propertyType, y = price)) + geom_boxplot()
+#Create a categorical feature
+df <- df %>% mutate(postcode = case_when(postcode > 2800 ~ "pc29",
+                                         TRUE ~ "pc26"))
+
+#Convert type
+df[, "postcode"] <- as.factor(df[, "postcode"])
 ```
 
-![](House_Price_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+Now we can visualize price per propertyType and postcode.
+
+``` r
+#Price boxplot
+ggplot(data = df, aes(x = propertyType, y = price)) + geom_boxplot(aes(color = postcode))
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+#Remove outliers (price higher than 2 000 000$)
+df <- df %>% filter(price < 2e+06)
+
+#Plot again price boxplot
+ggplot(data = df, aes(x = propertyType, y = price)) + geom_boxplot(aes(color = postcode))
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+It seems that property with postcode start with 26 are little more
+expensive than the others, but it still have an overlap between the two
+neighbourhoods.
+
+Another interesting graphic is price against number of bedrooms.
+
+``` r
+#Price against bedrooms
+ggplot(df, aes(x = factor(bedrooms), y = price)) + 
+  geom_violin(color = "#619CFF", fill = "#619CFF", alpha = 0.3) + 
+  geom_point(color = "#00BA38", alpha = 0.3, size = 0.5)
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 #Create month and year columns
 df$year <- year(df$datesold)
 df$month <- month(df$datesold, label = TRUE)
 
-ggplot(df, aes(x = year, y = price)) + geom_line()
+ggplot(df, aes(x = month, y = price)) +
+  geom_point(aes(color = factor(year))) + 
+  facet_wrap(~year) +
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
-![](House_Price_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
