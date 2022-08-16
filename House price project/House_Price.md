@@ -184,21 +184,71 @@ Another interesting graphic is price against number of bedrooms.
 ``` r
 #Price against bedrooms
 ggplot(df, aes(x = factor(bedrooms), y = price)) + 
-  geom_violin(color = "#619CFF", fill = "#619CFF", alpha = 0.3) + 
-  geom_point(color = "#00BA38", alpha = 0.3, size = 0.5)
+  geom_boxplot(alpha = 0.3) +
+  labs(x = "number of bedrooms")
 ```
 
 ![](House_Price_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+Another important graphic is the correlation heatmap. It shows the
+correlation between features, i.e. we need to test price and bedrooms
+relationship with each other.
+
+``` r
+#Create a correlation matrix
+corr_df <- df %>% select(c("price", "bedrooms")) %>% cor()
+corr_df
+```
+
+    ##              price  bedrooms
+    ## price    1.0000000 0.5326027
+    ## bedrooms 0.5326027 1.0000000
 
 ``` r
 #Create month and year columns
 df$year <- year(df$datesold)
 df$month <- month(df$datesold, label = TRUE)
 
+#Plot all sells per month and year
 ggplot(df, aes(x = month, y = price)) +
   geom_point(aes(color = factor(year))) + 
   facet_wrap(~year) +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_discrete(name = "year")
 ```
 
-![](House_Price_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+#Reshape data by year and month and calculate the price average
+df_time <- df %>% group_by(year, month) %>% summarize(medPrice = median(price))
+```
+
+    ## `summarise()` has grouped output by 'year'. You can override using the
+    ## `.groups` argument.
+
+``` r
+#Plot price evolution per month
+ggplot(df_time, aes(x = month, y = medPrice)) +
+  geom_line(aes(color = factor(year), group = year)) +
+  scale_color_discrete(name = "year")
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+#Reshape data by year
+df_time <- df %>% group_by(year, postcode) %>% summarize(medPrice = median(price))
+```
+
+    ## `summarise()` has grouped output by 'year'. You can override using the
+    ## `.groups` argument.
+
+``` r
+ggplot(df_time, aes(x = year, y = medPrice)) +
+  geom_line(aes(color = postcode))
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+### Modeling

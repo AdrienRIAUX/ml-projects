@@ -102,10 +102,18 @@ Another interesting graphic is price against number of bedrooms.
 ```{r}
 #Price against bedrooms
 ggplot(df, aes(x = factor(bedrooms), y = price)) + 
-  geom_violin(color = "#619CFF", fill = "#619CFF", alpha = 0.3) + 
-  geom_point(color = "#00BA38", alpha = 0.3, size = 0.5)
+  geom_boxplot(alpha = 0.3) +
+  labs(x = "number of bedrooms")
 ```
 
+Another important graphic is the correlation heatmap. It shows the correlation between features, i.e. we need to test price and bedrooms relationship with each other.
+
+
+```{r}
+#Create a correlation matrix
+corr_df <- df %>% select(c("price", "bedrooms")) %>% cor()
+corr_df
+```
 
 
 ```{r}
@@ -113,9 +121,33 @@ ggplot(df, aes(x = factor(bedrooms), y = price)) +
 df$year <- year(df$datesold)
 df$month <- month(df$datesold, label = TRUE)
 
+#Plot all sells per month and year
 ggplot(df, aes(x = month, y = price)) +
   geom_point(aes(color = factor(year))) + 
   facet_wrap(~year) +
-  theme(axis.text.x = element_text(angle = 90))
+  theme(axis.text.x = element_text(angle = 90)) +
+  scale_color_discrete(name = "year")
 ```
+```{r}
+#Reshape data by year and month and calculate the price average
+df_time <- df %>% group_by(year, month) %>% summarize(medPrice = median(price))
+
+#Plot price evolution per month
+ggplot(df_time, aes(x = month, y = medPrice)) +
+  geom_line(aes(color = factor(year), group = year)) +
+  scale_color_discrete(name = "year")
+  
+```
+
+
+```{r}
+#Reshape data by year
+df_time <- df %>% group_by(year, postcode) %>% summarize(medPrice = median(price))
+
+ggplot(df_time, aes(x = year, y = medPrice)) +
+  geom_line(aes(color = postcode))
+```
+
+### Modeling 
+
 
