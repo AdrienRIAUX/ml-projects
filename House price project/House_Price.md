@@ -48,6 +48,12 @@ library(lubridate)
     ## 
     ##     date, intersect, setdiff, union
 
+``` r
+library(coefplot)
+```
+
+    ## Warning: le package 'coefplot' a été compilé avec la version R 4.1.3
+
 We have several columns : - datesold : date of the property sale -
 postcode : postal code of the property - price : sale price of the
 property - propertyType : unit or house - bedrooms : number of bedrooms
@@ -252,3 +258,40 @@ ggplot(df_time, aes(x = year, y = medPrice)) +
 ![](House_Price_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ### Modeling
+
+We will define a linear model to predict the price with other features.
+
+``` r
+#Define a function for train and test split
+train_test_split <- function(data, train_size = 0.7) {
+  set.seed(123)
+  #Define the train size
+  smp_size <- floor(train_size * nrow(data))
+  #Define train index
+  train_idx <- sample(seq_len(nrow(data)), size = smp_size)
+  
+  train <- data[train_idx,]
+  test <- data[-train_idx,]
+  
+  return(list("train" = train, "test" = test))
+}
+
+#Split the data into train and test set
+split <- train_test_split(df)
+train <- split$train
+test <- split$test
+
+#Fit the linear regression
+model1 <- lm(price ~ datesold + postcode + bedrooms + propertyType,
+             data = train)
+```
+
+Now our linear regression are fit. We can use the summary function to
+print out information about the models.
+
+``` r
+#Visualize model coefficient
+coefplot(model1)
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->

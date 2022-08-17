@@ -13,6 +13,7 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(lubridate)
+library(coefplot)
 ```
 
 We have several columns : 
@@ -150,4 +151,39 @@ ggplot(df_time, aes(x = year, y = medPrice)) +
 
 ### Modeling 
 
+We will define a linear model to predict the price with other features.
+
+```{r}
+#Define a function for train and test split
+train_test_split <- function(data, train_size = 0.7) {
+  set.seed(123)
+  #Define the train size
+  smp_size <- floor(train_size * nrow(data))
+  #Define train index
+  train_idx <- sample(seq_len(nrow(data)), size = smp_size)
+  
+  train <- data[train_idx,]
+  test <- data[-train_idx,]
+  
+  return(list("train" = train, "test" = test))
+}
+
+#Split the data into train and test set
+split <- train_test_split(df)
+train <- split$train
+test <- split$test
+
+#Fit the linear regression
+model1 <- lm(price ~ datesold + postcode + bedrooms + propertyType,
+             data = train)
+```
+
+Now our linear regression are fit. We can use the summary function to print out information about the models.
+
+
+
+```{r}
+#Visualize model coefficient
+coefplot(model1)
+```
 
