@@ -14,6 +14,7 @@ library(tidyr)
 library(ggplot2)
 library(lubridate)
 library(coefplot)
+library(forecast)
 ```
 
 We have several columns : 
@@ -56,7 +57,27 @@ summary(df)
 
 We have no null values in the dataframe. Moreover postcode is only 4 digits reference, we don't expect that this data will be useful in this form. We will probably transform it into a categorical class. 
 
+Price has outliers, we will deal with it later. 
+
 ### Exploratory data analysis
+
+```{r}
+#Plot histogram of price
+ggplot(data = df, aes(x = price)) +
+  geom_histogram(alpha = 0.7)
+
+#Plot histogram of price using log scale
+ggplot(data = df, aes(x = log(price))) + 
+  geom_histogram(alpha = 0.7) 
+```
+Price has a log normal distribution, then it can be difficult for our machine learning model to predict value. Using log on price give a normal distribution. So we create a new column : logPrice = log(price). 
+
+```{r}
+#Create logPrice column
+df$logPrice = log(df$price)
+head(df)
+```
+
 
 ```{r}
 #Plot density of postcode per propertyType
@@ -84,16 +105,7 @@ Now we can visualize price per propertyType and postcode.
 
 ```{r}
 #Price boxplot
-ggplot(data = df, aes(x = propertyType, y = price)) + geom_boxplot(aes(color = postcode))
-```
-
-
-```{r}
-#Remove outliers (price higher than 2 000 000$)
-df <- df %>% filter(price < 2e+06)
-
-#Plot again price boxplot
-ggplot(data = df, aes(x = propertyType, y = price)) + geom_boxplot(aes(color = postcode))
+ggplot(data = df, aes(x = propertyType, y = logPrice)) + geom_boxplot(aes(color = postcode))
 ```
 
 It seems that property with postcode start with 26 are little more expensive than the others, but it still have an overlap between the two neighbourhoods.
@@ -102,17 +114,33 @@ Another interesting graphic is price against number of bedrooms.
 
 ```{r}
 #Price against bedrooms
-ggplot(df, aes(x = factor(bedrooms), y = price)) + 
+ggplot(df, aes(x = factor(bedrooms), y = logPrice)) + 
   geom_boxplot(alpha = 0.3) +
   labs(x = "number of bedrooms")
 ```
+Some houses/units with 0 bedrooms. It seems strange, moreover if we look at the boxplot, the price for these houses/units are particularly expensive.
+So we check the number of values per bedrooms.
+
+```{r}
+#Value counts for the bedrooms feature
+table(df$bedrooms)
+```
+
+They are only 30 houses/units with 0 bedrooms. We will simply drop them.
+
+```{r}
+#Drop line with zero bedrooms
+print(nrow(df))
+df <- df %>% filter(bedrooms != 0)
+print(nrow(df))
+```
+Very good, we have drop lines with zero bedrooms. 
 
 Another important graphic is the correlation heatmap. It shows the correlation between features, i.e. we need to test price and bedrooms relationship with each other.
 
-
 ```{r}
 #Create a correlation matrix
-corr_df <- df %>% select(c("price", "bedrooms")) %>% cor()
+corr_df <- df %>% select(c("logPrice", "bedrooms")) %>% cor()
 corr_df
 ```
 
@@ -121,20 +149,15 @@ corr_df
 #Create month and year columns
 df$year <- year(df$datesold)
 df$month <- month(df$datesold, label = TRUE)
-
-#Plot all sells per month and year
-ggplot(df, aes(x = month, y = price)) +
-  geom_point(aes(color = factor(year))) + 
-  facet_wrap(~year) +
-  theme(axis.text.x = element_text(angle = 90)) +
-  scale_color_discrete(name = "year")
 ```
+
+
 ```{r}
 #Reshape data by year and month and calculate the price average
-df_time <- df %>% group_by(year, month) %>% summarize(medPrice = median(price))
+df_time <- df %>% group_by(year, month) %>% summarize(med_logPrice = median(logPrice))
 
 #Plot price evolution per month
-ggplot(df_time, aes(x = month, y = medPrice)) +
+ggplot(df_time, aes(x = month, y = med_logPrice)) +
   geom_line(aes(color = factor(year), group = year)) +
   scale_color_discrete(name = "year")
   
@@ -143,9 +166,9 @@ ggplot(df_time, aes(x = month, y = medPrice)) +
 
 ```{r}
 #Reshape data by year
-df_time <- df %>% group_by(year, postcode) %>% summarize(medPrice = median(price))
+df_time <- df %>% group_by(year, postcode) %>% summarize(med_logPrice = median(logPrice))
 
-ggplot(df_time, aes(x = year, y = medPrice)) +
+ggplot(df_time, aes(x = year, y = med_logPrice)) +
   geom_line(aes(color = postcode))
 ```
 
@@ -154,36 +177,86 @@ ggplot(df_time, aes(x = year, y = medPrice)) +
 We will define a linear model to predict the price with other features.
 
 ```{r}
-#Define a function for train and test split
-train_test_split <- function(data, train_size = 0.7) {
-  set.seed(123)
-  #Define the train size
-  smp_size <- floor(train_size * nrow(data))
-  #Define train index
-  train_idx <- sample(seq_len(nrow(data)), size = smp_size)
-  
-  train <- data[train_idx,]
-  test <- data[-train_idx,]
-  
-  return(list("train" = train, "test" = test))
-}
-
-#Split the data into train and test set
-split <- train_test_split(df)
-train <- split$train
-test <- split$test
-
 #Fit the linear regression
-model1 <- lm(price ~ datesold + postcode + bedrooms + propertyType,
-             data = train)
+model <- lm(logPrice ~ datesold + bedrooms + postcode + propertyType,
+             data = df)
+
+#Model informations
+summary(model)
 ```
 
 Now our linear regression are fit. We can use the summary function to print out information about the models.
 
+We have a R-squared of 49%, it reveals that 49% of the variability observed in the target variable (logPrice) is explained by the regression model. 
 
+The coefficients represents the effect of the predictors on the response (logPrice) and the standard errors are the uncertainty in the estimation of the coefficients. We a visualisation plot to show the coefficient of the regression model. In general, a good rule of thumb is that if the two standard error confidence interval does not contain 0, it is statistically significant.
 
 ```{r}
 #Visualize model coefficient
-coefplot(model1)
+coefplot(model, sort = 'mag')
+
+#Visualize model coefficient with limited x axis scale
+coefplot(model, sort = 'mag') + scale_x_continuous(limits = c(-0.5,0.5))
+```
+
+```{r}
+#Check model performance with residual against fitted values
+ggplot(aes(x = .fitted, y = .resid), data = model) +
+  geom_point(aes(color = factor(bedrooms)), alpha = 0.7) +
+  geom_hline(yintercept = 0) +
+  geom_smooth(se = T) +
+  labs(x = "Fitted values", y = "Residuals") +
+  scale_color_discrete(name = "bedrooms")
+
+```
+
+```{r}
+#Q-Q plot
+ggplot(aes(sample = .stdresid), data = model) + 
+  stat_qq() + 
+  geom_abline() +
+  labs(title = "Q-Q plot")
+```
+
+Now we are interesting in modelisation of time series. 
+
+```{r}
+#Define the new dataframe with the median log price per year
+df_time <- df %>% group_by(year) %>% summarize(meanPrice = mean(price))
+
+#We convert it to a time series
+timePrice <- ts(df_time$meanPrice, start = min(df_time$year), end = max(df_time$year))
+
+#Plot the time series
+plot(timePrice)
+```
+
+```{r}
+#Show the autocovariance function (ACF)
+acf(timePrice)
+```
+
+```{r}
+#Determining the optimal number of diffs
+ndiffs(x = timePrice)
+
+plot(diff(timePrice, 1))
+```
+
+```{r}
+time_forcastPrice <- auto.arima(x = timePrice)
+time_forcastPrice
+```
+
+```{r}
+acf(time_forcastPrice$residuals)
+```
+
+```{r}
+predict(time_forcastPrice, n.ahead = 5, se.fit = T)
+```
+
+```{r}
+plot(forecast(object = time_forcastPrice, h = 5))
 ```
 
