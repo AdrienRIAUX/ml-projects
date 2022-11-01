@@ -36,38 +36,10 @@ library(ggplot2)
     ## Warning: le package 'ggplot2' a été compilé avec la version R 4.1.2
 
 ``` r
-library(lubridate)
-```
-
-    ## Warning: le package 'lubridate' a été compilé avec la version R 4.1.2
-
-    ## 
-    ## Attachement du package : 'lubridate'
-
-    ## Les objets suivants sont masqués depuis 'package:base':
-    ## 
-    ##     date, intersect, setdiff, union
-
-``` r
 library(coefplot)
 ```
 
     ## Warning: le package 'coefplot' a été compilé avec la version R 4.1.3
-
-``` r
-library(forecast)
-```
-
-    ## Warning: le package 'forecast' a été compilé avec la version R 4.1.3
-
-    ## Registered S3 method overwritten by 'quantmod':
-    ##   method            from
-    ##   as.zoo.data.frame zoo
-
-    ## Registered S3 methods overwritten by 'forecast':
-    ##   method       from  
-    ##   autoplot.acf useful
-    ##   fortify.ts   useful
 
 We have several columns : - datesold : date of the property sale -
 postcode : postal code of the property - price : sale price of the
@@ -80,410 +52,350 @@ df = read.csv("house_price.csv", header = TRUE, sep = ",")
 head(df)
 ```
 
-    ##              datesold postcode  price propertyType bedrooms
-    ## 1 2007-02-07 00:00:00     2607 525000        house        4
-    ## 2 2007-02-27 00:00:00     2906 290000        house        3
-    ## 3 2007-03-07 00:00:00     2905 328000        house        3
-    ## 4 2007-03-09 00:00:00     2905 380000        house        4
-    ## 5 2007-03-21 00:00:00     2906 310000        house        3
-    ## 6 2007-04-04 00:00:00     2905 465000        house        4
+    ##   Units   SqFt   Income Expense ValuePerSqFt      Boro
+    ## 1    42  36500  1332615  342005       200.00 Manhattan
+    ## 2    78 126420  6633257 1762295       242.76 Manhattan
+    ## 3   500 554174 17310000 3543000       164.15 Manhattan
+    ## 4   282 249076 11776313 2784670       271.23 Manhattan
+    ## 5   239 219495 10004582 2783197       247.48 Manhattan
+    ## 6   133 139719  5127687 1497788       191.37 Manhattan
 
-We can observe that our dataframe contains date, but there store as
-characters. Moreover, it seems that the propertyType and bedrooms
-columns are categorical features. To verify that, we observe the number
-of unique value for these features.
+We can observe that our dataframe several informations. For these data
+the response is the value per square foot and the predictors are
+everything else.
+
+Moreover, it seems that the Boro column is categorical features. To
+verify that, we observe the number of unique value for these features.
 
 ``` r
 #Check unique value of categorical features
-for (i in c("propertyType", "bedrooms")) {
-  print(unique(df[,i]))
-}
+print(unique(df[,"Boro"]))
 ```
 
-    ## [1] "house" "unit" 
-    ## [1] 4 3 5 1 2 0
+    ## [1] "Manhattan"     "Brooklyn"      "Queens"        "Bronx"        
+    ## [5] "Staten Island"
 
-Well, we have only to possible values for properyType and 6 for
-bedrooms. Use propertyType as factor would be interesting but we will
-keep bedrooms as int, because there are an order in this features. Have
-3 bedrooms is better than only 2 for example.
+Well, we have only five possible values for Boro column. Use Boro as
+factor would be interesting.
 
-So we can now convert propertyType and datesold features into
-appropriate types.
+So we can now convert Boro feature into an appropriate type.
 
 ``` r
 #Convert type
-df[, "propertyType"] <- as.factor(df[, "propertyType"])
-df[, "datesold"] <- as.Date(df[, "datesold"])
-
+df[, "Boro"] <- as.factor(df[, "Boro"])
 sapply(df, class)
 ```
 
-    ##     datesold     postcode        price propertyType     bedrooms 
-    ##       "Date"    "integer"    "integer"     "factor"    "integer"
+    ##        Units         SqFt       Income      Expense ValuePerSqFt         Boro 
+    ##    "integer"    "integer"    "integer"    "integer"    "numeric"     "factor"
 
 ``` r
 #Data description
 summary(df)
 ```
 
-    ##     datesold             postcode        price         propertyType 
-    ##  Min.   :2007-02-07   Min.   :2600   Min.   :  56500   house:24552  
-    ##  1st Qu.:2013-02-05   1st Qu.:2607   1st Qu.: 440000   unit : 5028  
-    ##  Median :2015-09-30   Median :2615   Median : 550000                
-    ##  Mean   :2015-02-21   Mean   :2730   Mean   : 609736                
-    ##  3rd Qu.:2017-07-26   3rd Qu.:2905   3rd Qu.: 705000                
-    ##  Max.   :2019-07-27   Max.   :2914   Max.   :8000000                
-    ##     bedrooms   
-    ##  Min.   :0.00  
-    ##  1st Qu.:3.00  
-    ##  Median :3.00  
-    ##  Mean   :3.25  
-    ##  3rd Qu.:4.00  
-    ##  Max.   :5.00
+    ##      Units              SqFt             Income            Expense        
+    ##  Min.   :   1.00   Min.   :    478   Min.   :    6424   Min.   :    1740  
+    ##  1st Qu.:  15.00   1st Qu.:  18704   1st Qu.:  405180   1st Qu.:  155515  
+    ##  Median :  30.00   Median :  38456   Median :  943901   Median :  350264  
+    ##  Mean   :  70.18   Mean   :  82763   Mean   : 2640882   Mean   :  840916  
+    ##  3rd Qu.:  75.00   3rd Qu.:  90626   3rd Qu.: 2725550   3rd Qu.:  899084  
+    ##  Max.   :3378.00   Max.   :3364977   Max.   :56010967   Max.   :21771401  
+    ##   ValuePerSqFt               Boro     
+    ##  Min.   : 10.66   Bronx        :  69  
+    ##  1st Qu.: 74.63   Brooklyn     : 717  
+    ##  Median :112.22   Manhattan    :1380  
+    ##  Mean   :131.19   Queens       : 434  
+    ##  3rd Qu.:187.49   Staten Island:  26  
+    ##  Max.   :399.38
 
-We have no null values in the dataframe. Moreover postcode is only 4
-digits reference, we don’t expect that this data will be useful in this
-form. We will probably transform it into a categorical class.
-
-Price has outliers, we will deal with it later.
+We have no null values in the dataframe. Regarding Units, Income,
+Expense and Value features we have outliers. It is important to identify
+them. We will deal with it later.
 
 ### Exploratory data analysis
 
 ``` r
-#Plot histogram of price
-ggplot(data = df, aes(x = price)) +
+#Plot histogram of value per suqare foot
+ggplot(data = df, aes(x = ValuePerSqFt)) +
   geom_histogram(alpha = 0.7)
 ```
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](House_Price_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> We can
+see that the histogram has a bimodal nature. So we explore more using
+histogram with a mapping color to Boro feature.
 
 ``` r
-#Plot histogram of price using log scale
-ggplot(data = df, aes(x = log(price))) + 
-  geom_histogram(alpha = 0.7) 
+# Histogram using a mapping color to Boro
+ggplot(data = df, aes(x = ValuePerSqFt, fill = Boro)) + 
+  geom_histogram(alpha = 0.7)
 ```
 
     ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
-![](House_Price_files/figure-gfm/unnamed-chunk-6-2.png)<!-- --> Price
-has a log normal distribution, then it can be difficult for our machine
-learning model to predict value. Using log on price give a normal
-distribution. So we create a new column : logPrice = log(price).
+![](House_Price_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-#Create logPrice column
-df$logPrice = log(df$price)
+# Same histogram using facet wrap
+ggplot(data = df, aes(x = ValuePerSqFt, fill = Boro)) + 
+  geom_histogram(alpha = 0.7) +
+  facet_wrap(~Boro)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](House_Price_files/figure-gfm/unnamed-chunk-7-2.png)<!-- --> We can
+see that Brooklyn and Queens make up one mode and Manhattan make up the
+other. While there is not much data on the Bronx and Staten Island.
+
+Boxplot can also be helpful to analyse the response.
+
+``` r
+#ValuePerSqFt boxplot
+ggplot(data = df, aes(x = Boro, y = ValuePerSqFt)) + 
+  geom_boxplot(aes(color = Boro))
+```
+
+![](House_Price_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+Now we look at histograms for SqFt, Units, Expense, Income and Value.
+
+``` r
+ggplot(data = df, aes(x = Units)) +
+  geom_histogram(alpha = 0.7)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](House_Price_files/figure-gfm/unnamed-chunk-9-1.png)<!-- --> It seems
+we have some outliers above 1000 units.
+
+``` r
+# Check the number of house with more than 1000 units
+sum(df$Units >= 1000)
+```
+
+    ## [1] 6
+
+We have only 6 outliers. We simply drop them.
+
+``` r
+# Remove outlier based on Units feature
+df <- df[df$Units < 1000, ]
+```
+
+Now we can analyse over features and check if there are outliers
+remaining.
+
+``` r
+for (col in c(1:4)) {
+  col_name <- names(df)
+  g <- ggplot(data = df, aes(x = df[, col])) +
+    geom_histogram(alpha = 0.7) +
+    xlab(col_name[col])
+  print(g)
+}
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](House_Price_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](House_Price_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](House_Price_files/figure-gfm/unnamed-chunk-12-3.png)<!-- -->
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+![](House_Price_files/figure-gfm/unnamed-chunk-12-4.png)<!-- -->
+
+They all have a log normal distribution, then it can be difficult for
+our machine learning model to use these values. Using log give a normal
+distribution. So we create new columns.
+
+``` r
+#Create log columns
+df$logUnits = log(df$Units)
+df$logExpense = log(df$Expense)
+df$logIncome = log(df$Income)
+df$logSqFt = log(df$SqFt)
+
 head(df)
 ```
 
-    ##     datesold postcode  price propertyType bedrooms logPrice
-    ## 1 2007-02-07     2607 525000        house        4 13.17115
-    ## 2 2007-02-27     2906 290000        house        3 12.57764
-    ## 3 2007-03-07     2905 328000        house        3 12.70077
-    ## 4 2007-03-09     2905 380000        house        4 12.84793
-    ## 5 2007-03-21     2906 310000        house        3 12.64433
-    ## 6 2007-04-04     2905 465000        house        4 13.04979
+    ##   Units   SqFt   Income Expense ValuePerSqFt      Boro logUnits logExpense
+    ## 1    42  36500  1332615  342005       200.00 Manhattan 3.737670   12.74258
+    ## 2    78 126420  6633257 1762295       242.76 Manhattan 4.356709   14.38213
+    ## 3   500 554174 17310000 3543000       164.15 Manhattan 6.214608   15.08048
+    ## 4   282 249076 11776313 2784670       271.23 Manhattan 5.641907   14.83964
+    ## 5   239 219495 10004582 2783197       247.48 Manhattan 5.476464   14.83911
+    ## 6   133 139719  5127687 1497788       191.37 Manhattan 4.890349   14.21950
+    ##   logIncome  logSqFt
+    ## 1  14.10265 10.50507
+    ## 2  15.70761 11.74736
+    ## 3  16.66679 13.22523
+    ## 4  16.28160 12.42551
+    ## 5  16.11855 12.29908
+    ## 6  15.45017 11.84739
+
+To see how it helps, we can visualize ValuePerSqFt versus log features.
 
 ``` r
 #Plot density of postcode per propertyType
-ggplot(data = df, aes(x = postcode)) + #Add histogram
-  geom_histogram(aes(
-    y = ..density.., 
-    fill = propertyType, 
-    color = propertyType
-  ), 
-  alpha = 0.3, position = "identity") + 
-  geom_density(aes(color = propertyType), size = 0.7)
+for (col in c(7:10)) {
+  col_name <- names(df)
+  g <- ggplot(data = df, aes(x = df[, col], y = ValuePerSqFt)) +
+    geom_point(alpha = 0.7, aes(color = Boro)) +
+    xlab(col_name[col])
+  print(g)
+}
 ```
 
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-
-![](House_Price_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> We have
-two group of postcode. But neither match with a propertyType. It could
-be interesting to create a categorical feature for the postcode and
-check if they are a place where the price is higher. It can be
-interpreted like neighbourhoods.
-
-``` r
-#Create a categorical feature
-df <- df %>% mutate(postcode = case_when(postcode > 2800 ~ "pc29",
-                                         TRUE ~ "pc26"))
-
-#Convert type
-df[, "postcode"] <- as.factor(df[, "postcode"])
-```
-
-Now we can visualize price per propertyType and postcode.
-
-``` r
-#Price boxplot
-ggplot(data = df, aes(x = propertyType, y = logPrice)) + geom_boxplot(aes(color = postcode))
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-It seems that property with postcode start with 26 are little more
-expensive than the others, but it still have an overlap between the two
-neighbourhoods.
-
-Another interesting graphic is price against number of bedrooms.
-
-``` r
-#Price against bedrooms
-ggplot(df, aes(x = factor(bedrooms), y = logPrice)) + 
-  geom_boxplot(alpha = 0.3) +
-  labs(x = "number of bedrooms")
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-11-1.png)<!-- --> Some
-houses/units with 0 bedrooms. It seems strange, moreover if we look at
-the boxplot, the price for these houses/units are particularly
-expensive. So we check the number of values per bedrooms.
-
-``` r
-#Value counts for the bedrooms feature
-table(df$bedrooms)
-```
-
-    ## 
-    ##     0     1     2     3     4     5 
-    ##    30  1627  3598 11933 10442  1950
-
-They are only 30 houses/units with 0 bedrooms. We will simply drop them.
-
-``` r
-#Drop line with zero bedrooms
-print(nrow(df))
-```
-
-    ## [1] 29580
-
-``` r
-df <- df %>% filter(bedrooms != 0)
-print(nrow(df))
-```
-
-    ## [1] 29550
-
-Very good, we have drop lines with zero bedrooms.
-
-Another important graphic is the correlation heatmap. It shows the
-correlation between features, i.e. we need to test price and bedrooms
-relationship with each other.
+![](House_Price_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->![](House_Price_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->![](House_Price_files/figure-gfm/unnamed-chunk-14-3.png)<!-- -->![](House_Price_files/figure-gfm/unnamed-chunk-14-4.png)<!-- -->
 
 ``` r
 #Create a correlation matrix
-corr_df <- df %>% select(c("logPrice", "bedrooms")) %>% cor()
-corr_df
+cor_df <- cor(select_if(df, is.numeric))
+heatmap(cor_df, scale = "column", margins = c(5,5))
 ```
 
-    ##          logPrice bedrooms
-    ## logPrice 1.000000 0.614465
-    ## bedrooms 0.614465 1.000000
-
-``` r
-#Create month and year columns
-df$year <- year(df$datesold)
-df$month <- month(df$datesold, label = TRUE)
-```
-
-``` r
-#Reshape data by year and month and calculate the price average
-df_time <- df %>% group_by(year, month) %>% summarize(med_logPrice = median(logPrice))
-```
-
-    ## `summarise()` has grouped output by 'year'. You can override using the
-    ## `.groups` argument.
-
-``` r
-#Plot price evolution per month
-ggplot(df_time, aes(x = month, y = med_logPrice)) +
-  geom_line(aes(color = factor(year), group = year)) +
-  scale_color_discrete(name = "year")
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
-
-``` r
-#Reshape data by year
-df_time <- df %>% group_by(year, postcode) %>% summarize(med_logPrice = median(logPrice))
-```
-
-    ## `summarise()` has grouped output by 'year'. You can override using the
-    ## `.groups` argument.
-
-``` r
-ggplot(df_time, aes(x = year, y = med_logPrice)) +
-  geom_line(aes(color = postcode))
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ### Modeling
 
-We will define a linear model to predict the price with other features.
+We will define a linear model to predict the value per square foot with
+other features but without log features in a first step.
 
 ``` r
 #Fit the linear regression
-model <- lm(logPrice ~ datesold + bedrooms + postcode + propertyType,
+model1 <- lm(ValuePerSqFt ~ Boro + Units + SqFt + Expense + Income, 
              data = df)
 
 #Model informations
-summary(model)
+summary(model1)
 ```
 
     ## 
     ## Call:
-    ## lm(formula = logPrice ~ datesold + bedrooms + postcode + propertyType, 
+    ## lm(formula = ValuePerSqFt ~ Boro + Units + SqFt + Expense + Income, 
     ##     data = df)
     ## 
     ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.5989 -0.1643 -0.0217  0.1341  2.3568 
+    ##      Min       1Q   Median       3Q      Max 
+    ## -201.149  -20.502    0.848   21.899  258.130 
     ## 
     ## Coefficients:
-    ##                    Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)       1.121e+01  2.506e-02  447.36   <2e-16 ***
-    ## datesold          7.999e-05  1.453e-06   55.03   <2e-16 ***
-    ## bedrooms          2.491e-01  2.230e-03  111.68   <2e-16 ***
-    ## postcodepc29     -1.984e-01  3.279e-03  -60.50   <2e-16 ***
-    ## propertyTypeunit -8.517e-02  5.692e-03  -14.96   <2e-16 ***
+    ##                     Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)        6.336e+01  4.728e+00  13.402  < 2e-16 ***
+    ## BoroBrooklyn       2.348e+01  4.872e+00   4.820 1.52e-06 ***
+    ## BoroManhattan      1.058e+02  4.840e+00  21.850  < 2e-16 ***
+    ## BoroQueens         2.500e+01  4.990e+00   5.010 5.79e-07 ***
+    ## BoroStaten Island -1.406e+00  8.740e+00  -0.161    0.872    
+    ## Units             -9.405e-03  2.175e-02  -0.432    0.665    
+    ## SqFt              -2.985e-04  3.462e-05  -8.622  < 2e-16 ***
+    ## Expense           -3.331e-05  3.219e-06 -10.348  < 2e-16 ***
+    ## Income             2.057e-05  7.803e-07  26.364  < 2e-16 ***
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 0.2669 on 29545 degrees of freedom
-    ## Multiple R-squared:  0.4932, Adjusted R-squared:  0.4931 
-    ## F-statistic:  7188 on 4 and 29545 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 37.71 on 2611 degrees of freedom
+    ## Multiple R-squared:  0.698,  Adjusted R-squared:  0.6971 
+    ## F-statistic: 754.4 on 8 and 2611 DF,  p-value: < 2.2e-16
 
 Now our linear regression are fit. We can use the summary function to
 print out information about the models.
 
-We have a R-squared of 49%, it reveals that 49% of the variability
-observed in the target variable (logPrice) is explained by the
-regression model.
+We have a R-squared of 70%, it reveals that 70% of the variability
+observed in the target variable (ValuePerSqFt) is explained by the
+regression model. Which is not bad.
+
+But know using log features instead.
+
+``` r
+#Fit the linear regression
+model2 <- lm(ValuePerSqFt ~ Boro + logUnits + logSqFt + logExpense
+             + logIncome, 
+             data = df)
+
+#Model informations
+summary(model2)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = ValuePerSqFt ~ Boro + logUnits + logSqFt + logExpense + 
+    ##     logIncome, data = df)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -148.095   -8.417   -2.361    8.731  223.469 
+    ## 
+    ## Coefficients:
+    ##                    Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)       -365.9461     8.1170 -45.084  < 2e-16 ***
+    ## BoroBrooklyn       -14.8079     2.6034  -5.688 1.43e-08 ***
+    ## BoroManhattan      -14.7519     2.8975  -5.091 3.81e-07 ***
+    ## BoroQueens         -17.8059     2.6571  -6.701 2.52e-11 ***
+    ## BoroStaten Island   -2.6959     4.5713  -0.590   0.5554    
+    ## logUnits            -1.7750     0.8984  -1.976   0.0483 *  
+    ## logSqFt           -118.8565     2.2960 -51.766  < 2e-16 ***
+    ## logExpense         -73.5380     2.3609 -31.148  < 2e-16 ***
+    ## logIncome          196.5220     2.0586  95.463  < 2e-16 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 19.72 on 2611 degrees of freedom
+    ## Multiple R-squared:  0.9175, Adjusted R-squared:  0.9172 
+    ## F-statistic:  3628 on 8 and 2611 DF,  p-value: < 2.2e-16
+
+The result is much more better, we have a R-squared of 92%, it reveals
+that 92% of the variability observed in the target variable
+(ValuePerSqFt) is explained by the regression model. Which is very good
 
 The coefficients represents the effect of the predictors on the response
-(logPrice) and the standard errors are the uncertainty in the estimation
-of the coefficients. We a visualisation plot to show the coefficient of
-the regression model. In general, a good rule of thumb is that if the
-two standard error confidence interval does not contain 0, it is
-statistically significant.
+(ValuePerSqFt) and the standard errors are the uncertainty in the
+estimation of the coefficients. We a visualisation plot to show the
+coefficient of the regression model. In general, a good rule of thumb is
+that if the two standard error confidence interval does not contain 0,
+it is statistically significant.
 
 ``` r
 #Visualize model coefficient
-coefplot(model, sort = 'mag')
+multiplot(model1, model2, sort = 'mag')
 ```
 
-![](House_Price_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
-
-``` r
-#Visualize model coefficient with limited x axis scale
-coefplot(model, sort = 'mag') + scale_x_continuous(limits = c(-0.5,0.5))
-```
-
-    ## Warning: Removed 1 rows containing missing values (geom_point).
-
-![](House_Price_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 #Check model performance with residual against fitted values
-ggplot(aes(x = .fitted, y = .resid), data = model) +
-  geom_point(aes(color = factor(bedrooms)), alpha = 0.7) +
+ggplot(aes(x = .fitted, y = .resid), data = model2) +
+  geom_point(aes(color = factor(Boro)), alpha = 0.7) +
   geom_hline(yintercept = 0) +
   geom_smooth(se = T) +
   labs(x = "Fitted values", y = "Residuals") +
-  scale_color_discrete(name = "bedrooms")
+  scale_color_discrete(name = "Boro")
 ```
 
     ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")'
 
-![](House_Price_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 #Q-Q plot
-ggplot(aes(sample = .stdresid), data = model) + 
+ggplot(aes(sample = .stdresid), data = model2) + 
   stat_qq() + 
   geom_abline() +
   labs(title = "Q-Q plot")
 ```
 
-![](House_Price_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](House_Price_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
-Now we are interesting in modelisation of time series.
-
-``` r
-#Define the new dataframe with the median log price per year
-df_time <- df %>% group_by(year) %>% summarize(meanPrice = mean(price))
-
-#We convert it to a time series
-timePrice <- ts(df_time$meanPrice, start = min(df_time$year), end = max(df_time$year))
-
-#Plot the time series
-plot(timePrice)
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
-
-``` r
-#Show the autocovariance function (ACF)
-acf(timePrice)
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
-
-``` r
-#Determining the optimal number of diffs
-ndiffs(x = timePrice)
-```
-
-    ## [1] 1
-
-``` r
-plot(diff(timePrice, 1))
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
-
-``` r
-time_forcastPrice <- auto.arima(x = timePrice)
-time_forcastPrice
-```
-
-    ## Series:  
-    ## ARIMA(0,1,0) 
-    ## 
-    ## sigma^2 = 830345258:  log likelihood = -140.25
-    ## AIC=282.5   AICc=282.9   BIC=282.99
-
-``` r
-acf(time_forcastPrice$residuals)
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
-
-``` r
-predict(time_forcastPrice, n.ahead = 5, se.fit = T)
-```
-
-    ## $pred
-    ## Time Series:
-    ## Start = 2020 
-    ## End = 2024 
-    ## Frequency = 1 
-    ## [1] 634830.9 634830.9 634830.9 634830.9 634830.9
-    ## 
-    ## $se
-    ## Time Series:
-    ## Start = 2020 
-    ## End = 2024 
-    ## Frequency = 1 
-    ## [1] 28815.71 40751.57 49910.28 57631.42 64433.89
-
-``` r
-plot(forecast(object = time_forcastPrice, h = 5))
-```
-
-![](House_Price_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+We can create new columns to ensure our result. This is call feature
+engineering. Using SqFt feature and Income, Expense and Units features,
+we can create UnitPerSqft, etc.
