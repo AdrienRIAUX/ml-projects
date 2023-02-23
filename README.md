@@ -1,15 +1,35 @@
 # Machine learning project
 
-Here you will find my academic project on machine learning issues and some Kaggle project.
-I mostly use Python to code on notebook. Nevertheless you can find R code too (to visualize result, please use .md file for R notebook).
+## Introduction
 
-Academic project : 
+This repository contains different projects, each with its own folder. You will find my academic, Kaggle, UCI... projects on machine learning issues.  
+I mainly use Python to code my notebooks. Nevertheless you can find R code too, to view the result on GitLab/GitHub of the R notebooks, please use the markdown file (.md) which has the same name as the R notebook (.Rmd).
+
+List of the project:
 - Car performance project
 - Diabetic retinopathy debrecen project
-
-Kaggle project : 
 - Heart disease project
 - Spam email detection project
 - Star classification project
 - Churn prediction project
 - House price project (work in progress)
+
+## ML techniques
+
+You will find both **supervised learning** and **unsupervised learning** in the different projects. Basic machine learning techniques are used to obtain results such as linear regression, decisions tree, random forest, ensemble learning, dimensionality reduction, clustering, SVM...
+
+## Folder template
+
+If it is a Python code:
+- notebook.ipynb
+- data.txt/.csv/...
+
+If it is a R code:
+- images_folder
+- notebook.Rmd
+- notebook.md
+- data.txt/.csv/...
+
+## Contact information
+
+You can contact me on [LinkdIn](https://www.linkedin.com/in/adrien-riaux/) or using my email address: adrien.riaux@efrei.net
