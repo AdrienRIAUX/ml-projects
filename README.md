@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains different projects, each with its own folder. You will find my academic, Kaggle, UCI... projects on machine learning issues.  
+This repository contains my academic projects on machine learning issues, each projects has its own folder. The code and the results are avaliable through notebooks.  
 I mainly use Python to code my notebooks. Nevertheless you can find R code too, to view the result on GitLab/GitHub of the R notebooks, please use the markdown file (.md) which has the same name as the R notebook (.Rmd).
 
 List of the project:
