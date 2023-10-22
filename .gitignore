@@ -8,3 +8,6 @@
 # Cache folders
 **/__pycache
 **/.pytest_cache
+
+# Poetry lock file
+poetry.lock
