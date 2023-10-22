@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "machine-learning-project"
+version = "0.1.0"
+description = "Academic projects on machine learning"
+authors = ["RIAUX <adrien.riaux@efrei.net>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.11"
+pandas = "^2.1.1"
+numpy = "^1.26.1"
+scikit-learn = "^1.3.1"
+matplotlib = "^3.8.0"
+seaborn = "^0.13.0"
+xgboost = "^2.0.0"
+imbalanced-learn = "^0.11.0"
+optuna = "^3.4.0"
+scikit-optimize = "^0.9.0"
+shap = "^0.43.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
