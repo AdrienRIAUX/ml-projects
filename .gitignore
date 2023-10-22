@@ -1,2 +1,10 @@
-.Rhistory
-.RData
+# R folders
+**/.Rhistory
+**/.RData
+
+# VS Code folders
+**/.vscode
+
+# Cache folders
+**/__pycache
+**/.pytest_cache
