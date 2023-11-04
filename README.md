@@ -30,6 +30,8 @@ If it is a R code:
 - notebook.md
 - data.txt/.csv/...
 
+Since the datasets are mainly small, they are stored with the notebooks.
+
 ## Contact information
 
 You can contact me on [LinkdIn](https://www.linkedin.com/in/adrien-riaux/) or using my email address: adrien.riaux@efrei.net
