@@ -12,7 +12,7 @@ List of the project:
 - Spam email detection project
 - Star classification project
 - Churn prediction project
-- House price project (work in progress)
+- House price project
 
 ## ML techniques
 
