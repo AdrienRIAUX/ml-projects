@@ -5,26 +5,26 @@ date : "01/08/2022"
 output: rmarkdown::github_document
 ---
 
-# House price project
+# Introduction
+
+This house price project revolves around the real estate domain, aiming to predict property prices. The dataset includes various columns such as features related to houses.
+
+Using machine learning techniques, this project strives to provide accurate predictions of house prices, empowering real estate professionals with valuable insights for making informed decisions in the housing market.
 
 ```{r}
-#Import 
+# Import
 library(dplyr)
 library(tidyr)
+library(ggfortify)
 library(ggplot2)
 library(coefplot)
 ```
 
-We have several columns : 
-- datesold : date of the property sale
-- postcode : postal code of the property
-- price : sale price of the property 
-- propertyType : unit or house 
-- bedrooms : number of bedrooms per property
+## Exploratory Data Analysis
 
 ```{r}
-#Read data
-df = read.csv("house_price.csv", header = TRUE, sep = ",")
+# Read the data
+df <- read.csv("house_price.csv", header=TRUE, sep=",")
 head(df)
 ```
 We can observe that our dataframe several informations. For these data the response is the value per square foot and the predictors are everything else.
@@ -33,8 +33,8 @@ Moreover, it seems that the Boro column is categorical features. To verify that,
 
 
 ```{r}
-#Check unique value of categorical features
-print(unique(df[,"Boro"]))
+# Check unique value of categorical features
+print(unique(df[, "Boro"]))
 ```
 
 Well, we have only five possible values for Boro column. Use Boro as factor would be interesting.
@@ -42,53 +42,58 @@ Well, we have only five possible values for Boro column. Use Boro as factor woul
 So we can now convert Boro feature into an appropriate type.
 
 ```{r}
-#Convert type
+# Convert type
 df[, "Boro"] <- as.factor(df[, "Boro"])
 sapply(df, class)
 ```
 
 ```{r}
-#Data description
+# Data description
 summary(df)
 ```
 
 We have no null values in the dataframe. Regarding Units, Income, Expense and Value features we have outliers. It is important to identify them. We will deal with it later.
 
-### Exploratory data analysis
+We can use graphical analysis to have more insight on the data.
 
 ```{r}
-#Plot histogram of value per suqare foot
-ggplot(data = df, aes(x = ValuePerSqFt)) +
-  geom_histogram(alpha = 0.7)
+# Plot histogram of value per square foot
+ggplot(data=df, aes(x=ValuePerSqFt)) +
+  geom_histogram(alpha=0.7)
 ```
+
 We can see that the histogram has a bimodal nature. So we explore more using histogram with a mapping color to Boro feature.
 
 ```{r}
 # Histogram using a mapping color to Boro
-ggplot(data = df, aes(x = ValuePerSqFt, fill = Boro)) + 
-  geom_histogram(alpha = 0.7)
+ggplot(data=df, aes(x=ValuePerSqFt, fill=Boro)) +
+  geom_histogram(alpha=0.7)
 
 # Same histogram using facet wrap
-ggplot(data = df, aes(x = ValuePerSqFt, fill = Boro)) + 
-  geom_histogram(alpha = 0.7) +
+ggplot(data=df, aes(x=ValuePerSqFt, fill=Boro)) +
+  geom_histogram(alpha=0.7) +
   facet_wrap(~Boro)
 ```
+
 We can see that Brooklyn and Queens make up one mode and Manhattan make up the other. While there is not much data on the Bronx and Staten Island.
 
 Boxplot can also be helpful to analyse the response.
 
 ```{r}
-#ValuePerSqFt boxplot
-ggplot(data = df, aes(x = Boro, y = ValuePerSqFt)) + 
-  geom_boxplot(aes(color = Boro))
+# ValuePerSqFt boxplot
+ggplot(data=df, aes(x=Boro, y=ValuePerSqFt)) +
+  geom_boxplot(aes(color=Boro))
 ```
+
+It seems that despite the unbalanced between groups, the ValuePerSqFt depends of the Boro, Manhattan median is higher than the others for example.
 
 Now we look at histograms for SqFt, Units, Expense, Income and Value.
 
 ```{r}
-ggplot(data = df, aes(x = Units)) +
-  geom_histogram(alpha = 0.7)
+ggplot(data=df, aes(x=Units)) +
+  geom_histogram(alpha=0.7)
 ```
+
 It seems we have some outliers above 1000 units. 
 
 ```{r}
@@ -107,8 +112,8 @@ Now we can analyse over features and check if there are outliers remaining.
 ```{r}
 for (col in c(1:4)) {
   col_name <- names(df)
-  g <- ggplot(data = df, aes(x = df[, col])) +
-    geom_histogram(alpha = 0.7) +
+  g <- ggplot(data=df, aes(x=df[, col])) +
+    geom_histogram(alpha=0.7) +
     xlab(col_name[col])
   print(g)
 }
@@ -117,11 +122,11 @@ for (col in c(1:4)) {
 They all have a log normal distribution, then it can be difficult for our machine learning model to use these values. Using log give a normal distribution. So we create new columns. 
 
 ```{r}
-#Create log columns
-df$logUnits = log(df$Units)
-df$logExpense = log(df$Expense)
-df$logIncome = log(df$Income)
-df$logSqFt = log(df$SqFt)
+# Create log columns
+df$logUnits <- log(df$Units)
+df$logExpense <- log(df$Expense)
+df$logIncome <- log(df$Income)
+df$logSqFt <- log(df$SqFt)
 
 head(df)
 ```
@@ -131,81 +136,147 @@ To see how it helps, we can visualize ValuePerSqFt versus log features.
 #Plot density of postcode per propertyType
 for (col in c(7:10)) {
   col_name <- names(df)
-  g <- ggplot(data = df, aes(x = df[, col], y = ValuePerSqFt)) +
-    geom_point(alpha = 0.7, aes(color = Boro)) +
+  g <- ggplot(data=df, aes(x=df[, col], y=ValuePerSqFt)) +
+    geom_point(alpha=0.7, aes(color=Boro)) +
     xlab(col_name[col])
   print(g)
 }
-
 ```
+
+It is difficult to see any trends here between ValuePerSqFt and log features. But we can see again the importance of the Boro, in particular with Manhattan.
+
+Another useful analysis is the correlation matrix. We can plot it using an heatmap, which also include dendrogram. It helps understanding relation between features.
 
 ```{r}
-#Create a correlation matrix
+# Create a correlation matrix
 cor_df <- cor(select_if(df, is.numeric))
-heatmap(cor_df, scale = "column", margins = c(5,5))
+heatmap(cor_df, scale="column", margins=c(5, 5))
 ```
 
-### Modeling 
+Some features are correlated, but there is no high correlation, so no fear about multi-colinearity. We can move on to the modeling section.
+
+## Modeling 
 
 We will define a linear model to predict the value per square foot with other features but without log features in a first step.
 
 ```{r}
-#Fit the linear regression
-model1 <- lm(ValuePerSqFt ~ Boro + Units + SqFt + Expense + Income, 
-             data = df)
+# Fit the linear regression
+model.1 <- lm(ValuePerSqFt ~ Boro + Units + SqFt + Expense + Income,
+             data=df)
 
-#Model informations
-summary(model1)
+# Model informations
+summary(model.1)
 ```
 
 Now our linear regression are fit. We can use the summary function to print out information about the models.
 
 We have a R-squared of 70%, it reveals that 70% of the variability observed in the target variable (ValuePerSqFt) is explained by the regression model. Which is not bad.
+We can note also that almost all the predictors are significant, except the Units. The Staten Island is not significant compare to the referential group which is the Bronx, as we have seen in the plots above, we have few data, and they are very similar for the two groups.
 
-But know using log features instead. 
+But now we can use the log features instead, to see if there is an improvement. 
 
 ```{r}
-#Fit the linear regression
-model2 <- lm(ValuePerSqFt ~ Boro + logUnits + logSqFt + logExpense
-             + logIncome, 
-             data = df)
+# Fit the linear regression
+model.2 <- lm(ValuePerSqFt ~ Boro + logUnits + logSqFt + logExpense
+             + logIncome,
+             data=df)
 
-#Model informations
-summary(model2)
+# Model informations
+summary(model.2)
 ```
 The result is much more better, we have a R-squared of 92%, it reveals that 92% of the variability observed in the target variable (ValuePerSqFt) is explained by the regression model. Which is very good
 
 
-The coefficients represents the effect of the predictors on the response (ValuePerSqFt) and the standard errors are the uncertainty in the estimation of the coefficients. We a visualisation plot to show the coefficient of the regression model. In general, a good rule of thumb is that if the two standard error confidence interval does not contain 0, it is statistically significant.
+The coefficients represents the effect of the predictors on the response (ValuePerSqFt) and the standard errors are the uncertainty in the estimation of the coefficients. 
+
+We can use a visualisation plot to show the coefficient of the regression model. In general, a good rule of thumb is that if the two standard error confidence interval does not contain 0, it is statistically significant.
 
 ```{r}
-#Visualize model coefficient
-multiplot(model1, model2, sort = 'mag')
+# Visualize model coefficient
+multiplot(model.1, model.2, sort="mag")
 ```
 
+We can see that using the model.2 (with log features) is more significant here.
+But one of the first-taught ways of assessing model quality is analysis of the residuals, which is the difference between the actual response and the fitted values. The basic idea is that if the model is appropriately fitted to the data, the residuals should be normally distributed as well.
+
+To see that, we can plot residuals against fitted values:
 ```{r}
-#Check model performance with residual against fitted values
-ggplot(aes(x = .fitted, y = .resid), data = model2) +
+# Check model performance with residuals against fitted values
+ggplot(aes(x = .fitted, y = .resid), data = model.2) +
   geom_point(aes(color = factor(Boro)), alpha = 0.7) +
   geom_hline(yintercept = 0) +
-  geom_smooth(se = T) +
+  geom_smooth(se = TRUE) +
   labs(x = "Fitted values", y = "Residuals") +
   scale_color_discrete(name = "Boro")
 
 ```
 
+The graphic is at first glance disconcerting, because the pattern in the residuals shows that they are not as randomly dispersed as desired. But we can see that this is due to the structure that Boro gives the data.
+
+Another way to check model quality is Q-Q plot. If the model is a good fit, the standardized residuals should fall along a straight line when plotted against the theoritical qauntiles of the normal distribution.
+
 ```{r}
-#Q-Q plot
-ggplot(aes(sample = .stdresid), data = model2) + 
-  stat_qq() + 
+# Q-Q plot
+ggplot(aes(sample = .stdresid), data = model.2) +
+  stat_qq() +
   geom_abline() +
   labs(title = "Q-Q plot")
 ```
 
-We can create new columns to ensure our result. This is call feature engineering.
-Using SqFt feature and Income, Expense and Units features, we can create UnitPerSqft, etc.
+Again it is roughly correct. May be we miss something, so we can check the residuals against the leverage (and the Cook's distance).
+
+High leverage consist on looking only on the x-axis, so it is a point which is far from the majority of the data, but it can be on all the line of y-axis (this is why we also look at Cook's distance). So high leverage does imply outlier, but high leverage implies influence data points. Note that leverage is between 0 and 1).
 
 ```{r}
-
+plot(model.2, which = 5)
 ```
 
+Here we can see that there is no high leverage, and none of the data points can be considering as outliers regarding the Cook's distance, (a Cook's distance above 0.5 can be consider as an outlier, and above 1 must be consider as an outlier).
+
+So, may be we have some features that damage our model, we can use stepwise selection based on AIC score to see if we can drop a feature to improve our model.
+
+```{r}
+# Stepwise selection based on AIC score
+step(model.2, direction = "both")
+```
+Nothing. Since the model quality check show us that we may miss something, a last thing to check before concluding and use the model.2 is to check for interactions between features. Based on the graphical analysis of the data, we can implement interaction terms between Boro and LogIcome.
+
+```{r}
+model.interact <- lm(ValuePerSqFt ~ Boro * logIncome + logExpense + logSqFt + logUnits,
+             data=df)
+
+summary(model.interact)
+```
+To compare models with different number of parameters, we use the adjusted R²; we can see that add an interaction terms does not improve model performance.
+
+We can create a graph that compare the three developed models using adjusted R², AIC and BIC (note that BIC penalize more the fact that add features than AIC).
+
+```{r}
+# Construct a dataframe with the adj. R² for each model
+result <- as.data.frame(rbind(
+  summary(model.1)$adj.r.squared,
+  summary(model.2)$adj.r.squared,
+  summary(model.interact)$adj.r.squared
+))
+
+names(result) <- "Adj. R²"
+result$Model <- c("Model.1", "Model.2", "Model.interaction")
+
+# Add AIC and BIC scores
+result$AIC <- AIC(model.1, model.2, model.interact)$AIC
+result$BIC <- BIC(model.1, model.2, model.interact)$BIC
+
+result.melt <- gather(result, 'Measure', 'Value', -Model)
+
+ggplot(result.melt, aes(x=Model, y=Value)) +
+  geom_line(aes(group=Measure, color=Measure)) +
+  facet_wrap(~Measure, scales="free_y") +
+  theme(axis.text.x=element_text(angle=45, vjust=.5)) +
+  guides(color="none")
+```
+
+We can conclude that there is no need to include interaction terms here, and we can use the model.2.
+
+## Conclusion
+
+This house price prediction project utilized machine learning, comparing models with varied preprocessing approaches. The most effective model emerged from combining data cleaning and log-transformed feature engineering. Comprehensive analysis of model parameters and quality metrics, visualized through plots, affirmed its superior performance. This underscores the significance of preprocessing and feature manipulation for accurate predictions. The identified optimal model empowers real estate professionals with a robust tool for informed decision-making. Overall, the project showcases the impact of thoughtful data preparation in enhancing predictive capabilities.
